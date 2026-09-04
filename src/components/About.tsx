@@ -42,23 +42,23 @@ export const About = () => {
               <span>About Our Movement</span>
             </div>
 
-            <h2 className="font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]">
+            <h2 className="font-heading font-extrabold text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]">
               MORE THAN <br />
               <span className="gold-gradient-text">A CLUB.</span>
             </h2>
 
-            <div className="p-6 glass-card rounded-2xl border border-white/10 relative overflow-hidden group">
+            <div className="p-4 sm:p-6 glass-card rounded-2xl border border-white/10 relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-[#D7B65A]/10 rounded-full blur-2xl -z-10" />
-              <div className="flex items-center space-x-4 mb-4">
+              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4 mb-4">
                 <img
                   src="/assets/logos/lia-shield.png"
                   alt="LIA Shield"
-                  className="h-16 w-auto object-contain"
+                  className="h-12 sm:h-16 w-auto object-contain shrink-0"
                 />
                 <div>
-                  <div className="text-sm font-bold text-white uppercase tracking-wider">Permanent Identity</div>
-                  <div className="text-xs text-[#E8D89A] font-medium">Since 2012 • 13+ Years of Journey</div>
-                  <div className="text-[11px] text-slate-400">Sponsored by Rotary Club of Coimbatore Texcity</div>
+                  <div className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider">Permanent Identity</div>
+                  <div className="text-[11px] sm:text-xs text-[#E8D89A] font-medium">Since 2012 • 13+ Years of Journey</div>
+                  <div className="text-[10px] sm:text-[11px] text-slate-400">Sponsored by Rotary Club of Coimbatore Texcity</div>
                 </div>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed border-t border-white/10 pt-3">

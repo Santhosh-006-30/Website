@@ -47,26 +47,23 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
       {/* Subtle background aura */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-48 bg-[#D7B65A]/5 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-16 border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-12 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-12 pb-12 sm:pb-16 border-b border-white/10">
           {/* Column 1: Dual Brand & Bio */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="sm:col-span-2 lg:col-span-4 space-y-5 sm:space-y-6">
             <div className="flex items-center space-x-3.5">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#10233D] to-[#07111F] border border-[#D7B65A]/40 flex items-center justify-center shadow-lg shadow-black/40 overflow-hidden p-1">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#10233D] to-[#07111F] border border-[#D7B65A]/40 flex items-center justify-center shadow-lg shadow-black/40 overflow-hidden p-1 shrink-0">
                 <img
-                  src="/assets/logos/lia-logo.png"
-                  alt="LIA Crest"
+                  src="/assets/logos/lia-shield.png"
+                  alt="LIA Shield"
                   className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
                 />
               </div>
               <div>
-                <span className="font-heading font-extrabold text-base tracking-wider text-white uppercase block leading-tight">
+                <span className="font-heading font-extrabold text-sm sm:text-base tracking-wider text-white uppercase block leading-tight">
                   ROTARACT CLUB OF
                 </span>
-                <span className="font-heading font-black text-xl text-[#D7B65A] tracking-wider block">
+                <span className="font-heading font-black text-lg sm:text-xl text-[#D7B65A] tracking-wider block">
                   LEAD INDIA AHEAD
                 </span>
               </div>

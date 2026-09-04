@@ -54,19 +54,19 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
               <span>Shape the Future • Join Team LIA</span>
             </div>
 
-            <h2 className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight leading-tight">
+            <h2 className="font-heading font-extrabold text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight">
               YOUR NEXT CHAPTER <br />
               <span className="gold-gradient-text">STARTS HERE.</span>
             </h2>
 
-            <p className="max-w-2xl mx-auto text-slate-300 text-sm sm:text-lg font-normal leading-relaxed">
+            <p className="max-w-2xl mx-auto text-slate-300 text-xs sm:text-base md:text-lg font-normal leading-relaxed">
               Whether you are a student exploring leadership or a young professional looking to create meaningful social impact, the Rotaract Club of Lead India Ahead welcomes you to a community of purpose.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-4">
               <button
                 onClick={onOpenModal}
-                className="w-full sm:w-auto px-9 py-4 rounded-full text-sm font-bold uppercase tracking-wider text-[#07111F] bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] hover:shadow-[0_0_30px_rgba(215,182,90,0.5)] transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center space-x-2 group"
+                className="w-full sm:w-auto px-7 sm:px-9 py-3.5 sm:py-4 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider text-[#07111F] bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] hover:shadow-[0_0_30px_rgba(215,182,90,0.5)] transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center space-x-2 group"
               >
                 <span>Join Rotaract LIA</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -74,13 +74,13 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
 
               <button
                 onClick={onOpenModal}
-                className="w-full sm:w-auto px-8 py-4 rounded-full text-sm font-semibold text-white bg-white/5 border border-white/15 hover:bg-white/10 hover:border-white/30 backdrop-blur-md transition-all transform hover:-translate-y-0.5"
+                className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full text-xs sm:text-sm font-semibold text-white bg-white/5 border border-white/15 hover:bg-white/10 hover:border-white/30 backdrop-blur-md transition-all transform hover:-translate-y-0.5 active:scale-95"
               >
                 Volunteer With Us
               </button>
             </div>
 
-            <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+            <div className="pt-6 sm:pt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-[11px] sm:text-xs text-slate-400">
               <span className="flex items-center space-x-1.5">
                 <Shield className="w-4 h-4 text-[#D7B65A]" />
                 <span>Rotaract District 3206 Official Charter</span>
@@ -97,7 +97,7 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
       {/* Join Application Modal */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -110,14 +110,14 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-xl glass-panel rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 p-6 sm:p-8"
+              className="relative w-full max-w-xl glass-panel rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 p-5 sm:p-8 max-h-[92vh] overflow-y-auto"
             >
               <button
                 onClick={onCloseModal}
-                className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
                 aria-label="Close form"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               {!submitted ? (

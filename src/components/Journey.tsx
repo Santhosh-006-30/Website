@@ -142,8 +142,8 @@ export const Journey: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        {/* Mobile Vertical Timeline */}
-        <div className="lg:hidden space-y-6 relative before:absolute before:inset-0 before:left-5 before:w-0.5 before:bg-white/10">
+        {/* Mobile & Tablet Vertical Timeline */}
+        <div className="lg:hidden space-y-6 relative before:absolute before:inset-0 before:left-3.5 sm:before:left-5 before:w-0.5 before:bg-white/10">
           {MILESTONES.map((m, idx) => (
             <motion.div
               key={idx}
@@ -151,18 +151,18 @@ export const Journey: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="relative pl-12"
+              className="relative pl-8 sm:pl-12"
             >
-              <div className="absolute left-3 top-2 w-5 h-5 rounded-full bg-[#D7B65A] border-4 border-[#07111F] -translate-x-1/2" />
+              <div className="absolute left-2.5 sm:left-3.5 top-3 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-[#D7B65A] border-2 sm:border-4 border-[#07111F] -translate-x-1/2 shadow" />
               
-              <div className="glass-card p-6 rounded-2xl border border-white/10 space-y-2">
+              <div className="glass-card p-4 sm:p-6 rounded-2xl border border-white/10 space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-heading font-bold text-[#E8D89A] text-base">{m.year}</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] uppercase font-semibold bg-white/5 text-slate-400">
+                  <span className="font-heading font-bold text-[#E8D89A] text-sm sm:text-base">{m.year}</span>
+                  <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] uppercase font-semibold bg-white/5 text-slate-400">
                     {m.category}
                   </span>
                 </div>
-                <h4 className="font-heading font-bold text-lg text-white">{m.title}</h4>
+                <h4 className="font-heading font-bold text-base sm:text-lg text-white leading-snug">{m.title}</h4>
                 <p className="text-xs text-slate-300 leading-relaxed font-normal">{m.description}</p>
               </div>
             </motion.div>

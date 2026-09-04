@@ -42,12 +42,12 @@ export const MaayonSection: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-heading font-extrabold text-4xl sm:text-6xl text-white tracking-tight leading-tight"
+            className="font-heading font-extrabold text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight"
           >
             THE CHAPTER OF <span className="gold-gradient-text">MAAYON</span>
           </motion.h2>
 
-          <p className="text-slate-300 text-sm sm:text-base mt-4 font-normal max-w-xl mx-auto">
+          <p className="text-slate-300 text-xs sm:text-base mt-3 sm:mt-4 font-normal max-w-xl mx-auto">
             The official presidential identity guiding the Rotaract Club of Lead India Ahead through Rotary Year 2026–27.
           </p>
         </div>
@@ -58,60 +58,60 @@ export const MaayonSection: React.FC = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="relative glass-card rounded-3xl p-8 sm:p-12 border border-[#D7B65A]/30 shadow-2xl shadow-black/50 overflow-hidden"
+          className="relative glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-12 border border-[#D7B65A]/30 shadow-2xl shadow-black/50 overflow-hidden"
         >
           {/* Top corner accents */}
-          <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-[#D7B65A]/60 rounded-tl-3xl" />
-          <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-[#D7B65A]/60 rounded-br-3xl" />
+          <div className="absolute top-0 left-0 w-12 sm:w-16 h-12 sm:h-16 border-t-2 border-l-2 border-[#D7B65A]/60 rounded-tl-2xl sm:rounded-tl-3xl" />
+          <div className="absolute bottom-0 right-0 w-12 sm:w-16 h-12 sm:h-16 border-b-2 border-r-2 border-[#D7B65A]/60 rounded-br-2xl sm:rounded-br-3xl" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-center">
             
             {/* Logo Emblem Presentation */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 bg-[#07111F]/80 rounded-2xl border border-[#D7B65A]/20 shadow-inner">
+            <div className="lg:col-span-5 flex flex-col items-center justify-center p-4 sm:p-6 bg-[#07111F]/80 rounded-2xl border border-[#D7B65A]/20 shadow-inner">
               <div className="relative group">
                 <div className="absolute -inset-4 bg-[#D7B65A]/20 rounded-full blur-xl opacity-80 group-hover:opacity-100 transition-opacity" />
                 <img
                   src="/assets/logos/maayon-theme.png"
                   alt="MAAYON 2026-27 Official Logo"
-                  className="relative h-28 sm:h-36 w-auto object-contain filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]"
+                  className="relative h-20 sm:h-28 md:h-36 w-auto object-contain filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]"
                 />
               </div>
 
-              <div className="mt-6 text-center space-y-1">
-                <div className="text-xs font-semibold uppercase tracking-widest text-[#E8D89A]">
+              <div className="mt-4 sm:mt-6 text-center space-y-1">
+                <div className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-[#E8D89A]">
                   Official Theme Insignia
                 </div>
-                <div className="text-sm font-heading font-bold text-white">
+                <div className="text-sm sm:text-base font-heading font-bold text-white">
                   Rtr. Hariharan B — President
                 </div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-[10px] sm:text-[11px] text-slate-400">
                   Rotaract Club of Lead India Ahead
                 </div>
               </div>
             </div>
 
             {/* Content & Theme Statement */}
-            <div className="lg:col-span-7 space-y-6 text-left">
-              <div className="space-y-2">
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left">
+              <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center space-x-2 text-xs font-semibold text-[#D7B65A] uppercase tracking-wider">
                   <Feather className="w-4 h-4" />
                   <span>Theme Directive</span>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-heading font-bold text-white">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-white">
                   Purposeful Leadership in Action
                 </h3>
               </div>
 
               {/* Official Theme Message Box (Centralized editable placeholder) */}
-              <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 relative">
+              <div className="p-4 sm:p-6 rounded-2xl bg-white/[0.03] border border-white/10 relative">
                 <div className="text-xs font-mono uppercase text-[#D7B65A] mb-2 flex items-center space-x-1.5">
                   <Star className="w-3.5 h-3.5" />
                   <span>Theme Statement</span>
                 </div>
-                <p className="text-slate-200 text-sm sm:text-base leading-relaxed italic">
+                <p className="text-slate-200 text-xs sm:text-sm md:text-base leading-relaxed italic">
                   "{CLUB_INFO.themeStatementPlaceholder}"
                 </p>
-                <div className="text-[11px] text-slate-400 mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                <div className="text-[10px] sm:text-[11px] text-slate-400 mt-3 pt-3 border-t border-white/5 flex flex-col xs:flex-row xs:items-center justify-between gap-1">
                   <span>Authorized by Presidential Office</span>
                   <span className="font-semibold text-white">Rotary Year 2026–27</span>
                 </div>

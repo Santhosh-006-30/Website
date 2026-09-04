@@ -57,21 +57,21 @@ export const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Left: Verified Contact Info Cards */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-4 sm:space-y-6">
             
             {/* Phone numbers */}
-            <div className="p-6 glass-card rounded-2xl border border-white/10 flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-[#D7B65A]/10 border border-[#D7B65A]/30 flex items-center justify-center text-[#D7B65A] shrink-0">
-                <Phone className="w-5 h-5" />
+            <div className="p-4 sm:p-6 glass-card rounded-2xl border border-white/10 flex items-start space-x-3.5 sm:space-x-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#D7B65A]/10 border border-[#D7B65A]/30 flex items-center justify-center text-[#D7B65A] shrink-0">
+                <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 min-w-0">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Direct Contact Numbers</h3>
                 <div className="space-y-0.5">
                   {CLUB_INFO.contact.phones.map((phone, idx) => (
                     <a
                       key={idx}
                       href={`tel:${phone.replace(/\s+/g, "")}`}
-                      className="block text-base font-semibold text-white hover:text-[#D7B65A] transition-colors"
+                      className="block text-sm sm:text-base font-semibold text-white hover:text-[#D7B65A] transition-colors"
                     >
                       {phone}
                     </a>
@@ -82,15 +82,15 @@ export const Contact = () => {
             </div>
 
             {/* Email Address */}
-            <div className="p-6 glass-card rounded-2xl border border-white/10 flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-[#06B6D4]/10 border border-[#06B6D4]/30 flex items-center justify-center text-[#06B6D4] shrink-0">
-                <Mail className="w-5 h-5" />
+            <div className="p-4 sm:p-6 glass-card rounded-2xl border border-white/10 flex items-start space-x-3.5 sm:space-x-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#06B6D4]/10 border border-[#06B6D4]/30 flex items-center justify-center text-[#06B6D4] shrink-0">
+                <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1 min-w-0">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Official Club Email</h3>
                 <a
                   href={`mailto:${CLUB_INFO.contact.email}`}
-                  className="block text-sm sm:text-base font-semibold text-white hover:text-[#06B6D4] transition-colors break-all"
+                  className="block text-xs sm:text-sm md:text-base font-semibold text-white hover:text-[#06B6D4] transition-colors break-all"
                 >
                   {CLUB_INFO.contact.email}
                 </a>
@@ -99,13 +99,13 @@ export const Contact = () => {
             </div>
 
             {/* Location */}
-            <div className="p-6 glass-card rounded-2xl border border-white/10 flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center text-[#10B981] shrink-0">
-                <MapPin className="w-5 h-5" />
+            <div className="p-4 sm:p-6 glass-card rounded-2xl border border-white/10 flex items-start space-x-3.5 sm:space-x-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center text-[#10B981] shrink-0">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="space-y-1">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Base of Operations</h3>
-                <div className="text-base font-semibold text-white">
+                <div className="text-sm sm:text-base font-semibold text-white">
                   Coimbatore, Tamil Nadu, India
                 </div>
                 <div className="text-xs text-slate-400">
@@ -115,27 +115,27 @@ export const Contact = () => {
             </div>
 
             {/* Verified Social Networks */}
-            <div className="p-6 glass-card rounded-2xl border border-white/10">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Official Channels</h3>
-              <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 sm:p-6 glass-card rounded-2xl border border-white/10">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 sm:mb-4">Official Channels</h3>
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                 <a
                   href={CLUB_INFO.contact.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center space-x-2.5 text-slate-200 hover:text-[#D7B65A] transition-colors"
+                  className="p-2.5 sm:p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center space-x-2 sm:space-x-2.5 text-slate-200 hover:text-[#D7B65A] transition-colors"
                 >
-                  <InstagramIcon className="w-4 h-4 text-[#F43F5E]" />
-                  <span className="text-xs font-semibold">Instagram</span>
+                  <InstagramIcon className="w-4 h-4 text-[#F43F5E] shrink-0" />
+                  <span className="text-xs font-semibold truncate">Instagram</span>
                 </a>
 
                 <a
                   href={CLUB_INFO.contact.linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center space-x-2.5 text-slate-200 hover:text-[#06B6D4] transition-colors"
+                  className="p-2.5 sm:p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center space-x-2 sm:space-x-2.5 text-slate-200 hover:text-[#06B6D4] transition-colors"
                 >
-                  <LinkedinIcon className="w-4 h-4 text-[#06B6D4]" />
-                  <span className="text-xs font-semibold">LinkedIn</span>
+                  <LinkedinIcon className="w-4 h-4 text-[#06B6D4] shrink-0" />
+                  <span className="text-xs font-semibold truncate">LinkedIn</span>
                 </a>
               </div>
             </div>
@@ -144,8 +144,8 @@ export const Contact = () => {
 
           {/* Right: Message Form */}
           <div className="lg:col-span-7">
-            <div className="glass-card rounded-3xl p-8 sm:p-10 border border-white/10 relative">
-              <h3 className="font-heading font-bold text-2xl text-white mb-2">Send an Inquiry</h3>
+            <div className="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-white/10 relative">
+              <h3 className="font-heading font-bold text-xl sm:text-2xl text-white mb-2">Send an Inquiry</h3>
               <p className="text-xs text-slate-400 mb-6 font-normal">
                 Leave your message below and our executive team will get back to you promptly.
               </p>

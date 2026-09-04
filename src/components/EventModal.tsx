@@ -49,19 +49,19 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="relative w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 max-h-[90vh] flex flex-col"
+          className="relative w-full max-w-3xl glass-panel rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 max-h-[92vh] flex flex-col"
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center border border-white/20 transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center border border-white/20 transition-colors"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* Banner Image */}
-          <div className="relative h-60 sm:h-72 w-full shrink-0">
+          <div className="relative h-44 sm:h-60 md:h-72 w-full shrink-0">
             {event.image ? (
               <img
                 src={event.image}
@@ -69,26 +69,26 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
                 className="w-full h-full object-cover object-center"
               />
             ) : (
-              <div className="w-full h-full bg-[#10233D] flex items-center justify-center text-slate-500">
+              <div className="w-full h-full bg-[#10233D] flex items-center justify-center text-slate-500 text-xs sm:text-sm">
                 LIA Official Event Record
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0B1728] via-[#0B1728]/40 to-transparent" />
             
-            <div className="absolute bottom-6 left-6 right-6">
-              <div className="flex flex-wrap gap-2 mb-2">
-                <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider border backdrop-blur-md ${badge.color}`}>
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                <span className={`px-2 py-0.5 sm:px-2.5 rounded text-[10px] sm:text-[11px] font-bold uppercase tracking-wider border backdrop-blur-md ${badge.color}`}>
                   {badge.label}
                 </span>
-                <span className="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider bg-[#07111F]/80 text-[#D7B65A] border border-[#D7B65A]/40 backdrop-blur-md">
+                <span className="px-2 py-0.5 sm:px-2.5 rounded text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-[#07111F]/80 text-[#D7B65A] border border-[#D7B65A]/40 backdrop-blur-md">
                   {event.category}
                 </span>
               </div>
-              <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-white leading-tight">
+              <h3 className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white leading-tight">
                 {event.title}
               </h3>
               {event.subtitle && (
-                <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1">
+                <p className="text-xs sm:text-sm text-slate-300 font-medium mt-1 truncate">
                   {event.subtitle}
                 </p>
               )}
@@ -96,7 +96,7 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
           </div>
 
           {/* Modal Content */}
-          <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
+          <div className="p-4 sm:p-6 md:p-8 overflow-y-auto space-y-5 sm:space-y-6">
             {/* Metadata Bar */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300">
               <div className="flex items-center space-x-2">

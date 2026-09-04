@@ -45,7 +45,7 @@ export const FeaturedProjects = () => {
               onClick={() => setSelectedProject(heroProject)}
               className="lg:col-span-7 glass-card rounded-2xl overflow-hidden border border-white/10 group cursor-pointer flex flex-col justify-between transition-all hover:border-[#D7B65A]/40 hover:shadow-2xl"
             >
-              <div className="relative h-64 sm:h-80 overflow-hidden">
+              <div className="relative h-48 sm:h-64 lg:h-80 overflow-hidden">
                 <img
                   src={heroProject.image}
                   alt={heroProject.title}
@@ -59,9 +59,9 @@ export const FeaturedProjects = () => {
                 </div>
               </div>
 
-              <div className="p-6 sm:p-8 flex flex-col justify-between flex-1">
+              <div className="p-5 sm:p-7 lg:p-8 flex flex-col justify-between flex-1">
                 <div>
-                  <div className="flex items-center space-x-3 text-xs text-slate-400 mb-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:space-x-3 text-xs text-slate-400 mb-3">
                     <span className="text-[#D7B65A] font-semibold uppercase">{heroProject.category}</span>
                     <span>•</span>
                     <span className="flex items-center space-x-1">
@@ -70,21 +70,21 @@ export const FeaturedProjects = () => {
                     </span>
                   </div>
 
-                  <h3 className="font-heading font-bold text-2xl sm:text-3xl text-white mb-3 group-hover:text-[#E8D89A] transition-colors leading-snug">
+                  <h3 className="font-heading font-bold text-xl sm:text-2xl lg:text-3xl text-white mb-3 group-hover:text-[#E8D89A] transition-colors leading-snug">
                     {heroProject.title}
                   </h3>
 
-                  <p className="text-slate-300 text-sm sm:text-base leading-relaxed line-clamp-3 mb-6 font-normal">
+                  <p className="text-slate-300 text-xs sm:text-sm lg:text-base leading-relaxed line-clamp-3 mb-6 font-normal">
                     {heroProject.description}
                   </p>
                 </div>
 
                 {heroProject.impactMetrics && (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-t border-white/10 my-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 py-3 sm:py-4 border-t border-white/10 my-2">
                     {heroProject.impactMetrics.map((m, i) => (
                       <div key={i} className="text-left">
-                        <div className="text-lg font-heading font-extrabold text-white">{m.value}</div>
-                        <div className="text-[10px] uppercase tracking-wider text-slate-400">{m.label}</div>
+                        <div className="text-base sm:text-lg font-heading font-extrabold text-white">{m.value}</div>
+                        <div className="text-[9px] sm:text-[10px] uppercase tracking-wider text-slate-400">{m.label}</div>
                       </div>
                     ))}
                   </div>
@@ -231,38 +231,38 @@ export const FeaturedProjects = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="relative w-full max-w-3xl glass-panel rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 max-h-[90vh] flex flex-col"
+              className="relative w-full max-w-3xl glass-panel rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 max-h-[92vh] flex flex-col"
             >
               {/* Close button */}
               <button
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center border border-white/20 transition-colors"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center border border-white/20 transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Modal Banner */}
-              <div className="relative h-64 sm:h-72 w-full shrink-0">
+              <div className="relative h-44 sm:h-60 md:h-72 w-full shrink-0">
                 <img
                   src={selectedProject.image}
                   alt={selectedProject.title}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1728] via-[#0B1728]/40 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
-                  <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-[#D7B65A] text-[#07111F]">
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
+                  <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-[#D7B65A] text-[#07111F]">
                     {selectedProject.category}
                   </span>
-                  <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-white mt-2 leading-tight">
+                  <h3 className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white mt-1.5 leading-tight">
                     {selectedProject.title}
                   </h3>
                 </div>
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
-                <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-300 border-b border-white/10 pb-4">
+              <div className="p-4 sm:p-6 md:p-8 overflow-y-auto space-y-5 sm:space-y-6">
+                <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-medium text-slate-300 border-b border-white/10 pb-4">
                   <div className="flex items-center space-x-1.5">
                     <Calendar className="w-4 h-4 text-[#D7B65A]" />
                     <span>Timeline: {selectedProject.date}</span>
@@ -274,9 +274,9 @@ export const FeaturedProjects = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Initiative Narrative</h4>
-                  <p className="text-sm sm:text-base text-slate-200 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm md:text-base text-slate-200 leading-relaxed font-normal">
                     {selectedProject.description}
                   </p>
                 </div>

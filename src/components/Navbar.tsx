@@ -65,41 +65,41 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           {/* Logo & Permanent Identity */}
           <a
             href="#hero"
-            className="flex items-center space-x-3.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A] rounded-lg p-1"
+            className="flex items-center space-x-2.5 sm:space-x-3.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A] rounded-lg p-1 min-w-0"
           >
-            <div className="relative">
+            <div className="relative shrink-0">
               <img
                 src="/assets/logos/lia-shield.png"
                 alt="Rotaract Club of Lead India Ahead Shield Logo"
-                className="h-11 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                className="h-9 sm:h-11 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
               />
               <div className="absolute -inset-1 bg-[#D7B65A]/20 blur-sm rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-2">
-                <span className="font-heading font-bold text-white text-base sm:text-lg tracking-wide group-hover:text-[#E8D89A] transition-colors">
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center space-x-1.5 sm:space-x-2">
+                <span className="font-heading font-bold text-white text-sm sm:text-base lg:text-lg tracking-wide group-hover:text-[#E8D89A] transition-colors truncate">
                   ROTARACT LIA
                 </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-white/10 text-[#D7B65A] border border-[#D7B65A]/30 rounded">
+                <span className="hidden xs:inline-block px-1.5 py-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider bg-white/10 text-[#D7B65A] border border-[#D7B65A]/30 rounded shrink-0">
                   Dist. 3206
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 font-medium tracking-tight">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium tracking-tight truncate">
                 Lead India Ahead • Since 2012
               </span>
             </div>
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2 bg-white/[0.03] border border-white/10 backdrop-blur-md px-4 py-1.5 rounded-full shadow-inner">
+          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2 bg-white/[0.03] border border-white/10 backdrop-blur-md px-3 xl:px-4 py-1.5 rounded-full shadow-inner">
             {navLinks.map((link) => {
               const isActive = activeSection === link.href.substring(1);
               return (
                 <a
                   key={link.name}
                   href={link.href}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 relative ${
+                  className={`px-2.5 xl:px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 relative ${
                     isActive
                       ? "text-white font-semibold"
                       : "text-slate-300 hover:text-white hover:bg-white/5"
@@ -119,11 +119,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           </nav>
 
           {/* Action CTAs */}
-          <div className="hidden sm:flex items-center space-x-3">
+          <div className="hidden sm:flex items-center space-x-2.5 sm:space-x-3">
             {/* Presidential theme pill */}
             <a
               href="#maayon"
-              className="hidden xl:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#10233D]/70 border border-[#D7B65A]/30 text-xs text-[#E8D89A] hover:border-[#D7B65A] transition-all group"
+              className="hidden xl:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#10233D]/70 border border-[#D7B65A]/30 text-xs text-[#E8D89A] hover:border-[#D7B65A] transition-all group shrink-0"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#D7B65A] animate-pulse" />
               <span className="font-semibold tracking-wider text-[11px]">MAAYON '26–27</span>
@@ -131,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
 
             <button
               onClick={onOpenJoinModal}
-              className="relative inline-flex items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#07111F] transition-all duration-300 bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] rounded-full hover:shadow-[0_0_20px_rgba(215,182,90,0.5)] active:scale-95 group overflow-hidden"
+              className="relative inline-flex items-center justify-center px-3.5 sm:px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#07111F] transition-all duration-300 bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] rounded-full hover:shadow-[0_0_20px_rgba(215,182,90,0.5)] active:scale-95 group overflow-hidden shrink-0"
             >
               <span className="relative z-10 flex items-center space-x-1.5">
                 <span>Join Us</span>
@@ -142,19 +142,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           </div>
 
           {/* Mobile Hamburger Button */}
-          <div className="flex items-center space-x-2 lg:hidden">
+          <div className="flex items-center space-x-2 lg:hidden shrink-0">
             <button
               onClick={onOpenJoinModal}
-              className="sm:hidden px-3 py-1.5 text-xs font-semibold text-[#07111F] bg-[#D7B65A] rounded-full"
+              className="sm:hidden px-3 py-1.5 text-xs font-semibold text-[#07111F] bg-[#D7B65A] rounded-full active:scale-95 transition-transform"
             >
               Join
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white focus:outline-none"
+              className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white focus:outline-none active:scale-95"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
           </div>
         </div>

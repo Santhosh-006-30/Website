@@ -59,48 +59,48 @@ export const Events = () => {
             className="mb-14 glass-card rounded-3xl overflow-hidden border border-[#D7B65A]/30 group cursor-pointer hover:shadow-2xl transition-all relative"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
-              <div className="lg:col-span-7 relative h-72 sm:h-96 overflow-hidden">
+              <div className="lg:col-span-7 relative h-56 sm:h-72 lg:h-96 overflow-hidden">
                 <img
                   src={featuredEvent.image}
                   alt={featuredEvent.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-transparent to-[#07111F]" />
-                <div className="absolute top-4 left-4 flex gap-2">
-                  <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-[#D7B65A] text-[#07111F] shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#07111F]/90 via-[#07111F]/30 lg:via-transparent to-transparent lg:to-[#07111F]" />
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                  <span className="px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-[#D7B65A] text-[#07111F] shadow-lg">
                     Featured Installation
                   </span>
-                  <span className="px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-[#07111F]/80 text-[#E8D89A] border border-[#D7B65A]/40 backdrop-blur-md">
+                  <span className="px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-[#07111F]/80 text-[#E8D89A] border border-[#D7B65A]/40 backdrop-blur-md">
                     Rotary Year 2026–27
                   </span>
                 </div>
               </div>
 
-              <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 space-y-4">
-                <div className="flex items-center space-x-2 text-xs text-slate-400">
+              <div className="lg:col-span-5 p-5 sm:p-8 lg:p-10 space-y-3 sm:space-y-4">
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
                   <Calendar className="w-4 h-4 text-[#D7B65A]" />
                   <span className="font-semibold text-white">{featuredEvent.displayDate}</span>
                   <span>•</span>
                   <span>{featuredEvent.location}</span>
                 </div>
 
-                <h3 className="font-heading font-extrabold text-3xl sm:text-4xl text-white group-hover:text-[#E8D89A] transition-colors leading-tight">
+                <h3 className="font-heading font-extrabold text-2xl sm:text-3xl lg:text-4xl text-white group-hover:text-[#E8D89A] transition-colors leading-tight">
                   {featuredEvent.title}
                 </h3>
-                <p className="text-sm font-semibold text-[#D7B65A]">
+                <p className="text-xs sm:text-sm font-semibold text-[#D7B65A]">
                   {featuredEvent.subtitle}
                 </p>
 
-                <p className="text-slate-300 text-sm leading-relaxed font-normal">
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-normal">
                   {featuredEvent.shortDescription}
                 </p>
 
-                <div className="pt-4 flex items-center justify-between text-xs font-semibold text-white border-t border-white/10">
-                  <span className="flex items-center space-x-1.5 text-[#10B981]">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>LIA Organized • Afternoon Newspaper Featured</span>
+                <div className="pt-3 sm:pt-4 flex items-center justify-between text-xs font-semibold text-white border-t border-white/10">
+                  <span className="flex items-center space-x-1.5 text-[#10B981] text-[11px] sm:text-xs">
+                    <ShieldCheck className="w-4 h-4 shrink-0" />
+                    <span className="truncate">LIA Organized • Afternoon Newspaper Featured</span>
                   </span>
-                  <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-[#D7B65A] group-hover:text-[#07111F] flex items-center justify-center transition-colors">
+                  <div className="w-8 h-8 rounded-full bg-white/5 group-hover:bg-[#D7B65A] group-hover:text-[#07111F] flex items-center justify-center transition-colors shrink-0 ml-2">
                     <ArrowUpRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -110,18 +110,18 @@ export const Events = () => {
         )}
 
         {/* Filters Bar */}
-        <div className="flex items-center justify-between flex-wrap gap-3 mb-10 pb-4 border-b border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8 sm:mb-10 pb-4 border-b border-white/10">
           <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-400">
             <Filter className="w-3.5 h-3.5 text-[#D7B65A]" />
             <span>Filter Events</span>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {filterOptions.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setActiveFilter(f.value)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+                className={`px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all ${
                   activeFilter === f.value
                     ? "bg-[#D7B65A] text-[#07111F] font-bold shadow-md shadow-[#D7B65A]/20"
                     : "bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 border border-white/5"
