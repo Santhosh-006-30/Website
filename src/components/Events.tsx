@@ -1,13 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, MapPin, ArrowUpRight, ShieldCheck, Filter } from "lucide-react";
 import { EVENTS } from "../data/events";
 import type { Event } from "../types";
 import { EventModal } from "./EventModal";
+import { getPublishedEvents } from "../services/events";
+
+function mapSupabaseEventToPublicEvent(dbEvent: any): Event {
+  return {
+    id: dbEvent.id,
+    title: dbEvent.title,
+    subtitle: dbEvent.subtitle || undefined,
+    slug: dbEvent.slug,
+    date: dbEvent.event_date || undefined,
+    displayDate: dbEvent.display_date || dbEvent.event_date || undefined,
+    year: dbEvent.year || new Date(dbEvent.event_date || Date.now()).getFullYear(),
+    category: dbEvent.category || "General",
+    status: (dbEvent.status === "published" ? "completed" : "upcoming") as any,
+    location: dbEvent.venue || dbEvent.city || undefined,
+    description: dbEvent.description || "",
+    shortDescription: dbEvent.short_description || dbEvent.description || "",
+    image: dbEvent.cover_image_url || undefined,
+    featured: Boolean(dbEvent.featured),
+    organizerType: dbEvent.organizer_type || "LIA",
+    liaRole: dbEvent.lia_role || "ORGANIZER",
+    organizer: dbEvent.organizer || undefined,
+    collaborators: dbEvent.collaborators || [],
+    tags: dbEvent.tags || [],
+    source: dbEvent.source_platform ? {
+      platform: dbEvent.source_platform as any,
+      url: dbEvent.source_url || undefined,
+      verified: Boolean(dbEvent.source_verified),
+    } : undefined,
+  };
+}
 
 export const Events = () => {
+  const [eventsList, setEventsList] = useState<Event[]>(EVENTS);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [activeFilter, setActiveFilter] = useState("ALL");
+
+  useEffect(() => {
+    let isMounted = true;
+    getPublishedEvents()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setEventsList(data.map(mapSupabaseEventToPublicEvent));
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load events from database, using static fallback:", err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const filterOptions = [
     { label: "ALL", value: "ALL" },
@@ -20,14 +67,14 @@ export const Events = () => {
     { label: "DISTRICT EVENTS", value: "DISTRICT EVENTS" },
   ];
 
-  const filteredEvents = EVENTS.filter((ev) => {
+  const filteredEvents = eventsList.filter((ev) => {
     if (activeFilter === "ALL") return true;
     if (activeFilter === "2026") return ev.year === 2026;
     if (activeFilter === "2025") return ev.year === 2025;
     return ev.category.toUpperCase().includes(activeFilter);
   });
 
-  const featuredEvent = EVENTS.find((e) => e.featured && e.id.includes("the-one"));
+  const featuredEvent = eventsList.find((e) => e.featured && e.id.includes("the-one")) || eventsList.find((e) => e.featured) || eventsList[0];
 
   return (
     <section id="events" className="py-24 bg-[#07111F] relative overflow-hidden border-t border-white/5">

@@ -1,17 +1,57 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Calendar, X, ShieldCheck, ExternalLink } from "lucide-react";
 import { PROJECTS } from "../data/projects";
 import type { Project } from "../types";
+import { getPublishedProjects } from "../services/projects";
+
+function mapSupabaseProjectToPublicProject(dbProj: any): Project {
+  return {
+    id: dbProj.id,
+    title: dbProj.title,
+    slug: dbProj.slug,
+    category: dbProj.category || "Community Service",
+    date: dbProj.project_date || `${dbProj.year || new Date().getFullYear()}`,
+    year: dbProj.year || new Date().getFullYear(),
+    description: dbProj.description || "",
+    shortDescription: dbProj.short_description || dbProj.description || "",
+    image: dbProj.cover_image_url || "",
+    featured: Boolean(dbProj.featured),
+    impactMetrics: dbProj.impact_metrics || undefined,
+    collaborators: dbProj.collaborators || undefined,
+    source: dbProj.source_platform ? {
+      platform: dbProj.source_platform as any,
+      url: dbProj.source_url || undefined,
+      verified: Boolean(dbProj.source_verified),
+    } : undefined,
+  };
+}
 
 export const FeaturedProjects = () => {
+  const [projectsList, setProjectsList] = useState<Project[]>(PROJECTS);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  useEffect(() => {
+    let isMounted = true;
+    getPublishedProjects()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setProjectsList(data.map(mapSupabaseProjectToPublicProject));
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load projects from database, using static fallback:", err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Asymmetric arrangement:
-  const heroProject = PROJECTS[0]; // Large featured
-  const sideProject1 = PROJECTS[1]; // Supporting 1
-  const sideProject2 = PROJECTS[2]; // Supporting 2
-  const wideProject = PROJECTS[3]; // Large horizontal
+  const heroProject = projectsList[0] || PROJECTS[0];
+  const sideProject1 = projectsList[1] || PROJECTS[1];
+  const sideProject2 = projectsList[2] || PROJECTS[2];
+  const wideProject = projectsList[3] || PROJECTS[3];
 
   return (
     <section id="projects" className="py-24 bg-[#0B1728] relative overflow-hidden">

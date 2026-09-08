@@ -2,14 +2,44 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Image as ImageIcon, X, ChevronLeft, ChevronRight, Calendar, Maximize2 } from "lucide-react";
 import { GALLERY_ITEMS } from "../data/gallery";
+import type { GalleryItem } from "../types";
+import { getPublishedGalleryImages } from "../services/gallery";
+
+function mapSupabaseGalleryToPublic(dbItem: any): GalleryItem {
+  return {
+    id: dbItem.id,
+    title: dbItem.title || dbItem.caption || "Club Photo",
+    category: (dbItem.category || "EVENTS") as any,
+    image: dbItem.image_url,
+    date: dbItem.date || "",
+    caption: dbItem.caption || undefined,
+  };
+}
 
 export const Gallery = () => {
+  const [galleryList, setGalleryList] = useState<GalleryItem[]>(GALLERY_ITEMS);
   const [activeCategory, setActiveCategory] = useState<string>("ALL");
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
   const categories = ["ALL", "EVENTS", "PROJECTS", "COMMUNITY", "LEADERSHIP"];
 
-  const filteredItems = GALLERY_ITEMS.filter((item) => {
+  useEffect(() => {
+    let isMounted = true;
+    getPublishedGalleryImages()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setGalleryList(data.map(mapSupabaseGalleryToPublic));
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load gallery from database, using static fallback:", err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredItems = galleryList.filter((item) => {
     if (activeCategory === "ALL") return true;
     return item.category === activeCategory;
   });

@@ -1,16 +1,49 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, FileText, X, GraduationCap, ShieldCheck, Heart } from "lucide-react";
 import { TEAM_MEMBERS } from "../data/team";
 import type { TeamMember } from "../types";
+import { getPublishedTeamMembers } from "../services/team";
+
+function mapSupabaseTeamMemberToPublic(dbMember: any): TeamMember {
+  return {
+    id: dbMember.id,
+    name: dbMember.name,
+    position: dbMember.designation,
+    term: dbMember.term || "2026–27",
+    image: dbMember.profile_image_url || undefined,
+    letterImage: dbMember.letter_image_url || undefined,
+    bio: dbMember.bio || undefined,
+    collegeOrCompany: dbMember.college_company || undefined,
+    bloodGroup: dbMember.blood_group || undefined,
+    isExecutive: Boolean(dbMember.is_executive),
+  };
+}
 
 export const Leadership = () => {
+  const [membersList, setMembersList] = useState<TeamMember[]>(TEAM_MEMBERS);
   const [activeTab, setActiveTab] = useState<"EXECUTIVE" | "ALL">("EXECUTIVE");
   const [selectedLetter, setSelectedLetter] = useState<TeamMember | null>(null);
 
+  useEffect(() => {
+    let isMounted = true;
+    getPublishedTeamMembers()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setMembersList(data.map(mapSupabaseTeamMemberToPublic));
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load team members from database, using static fallback:", err);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const displayedMembers = activeTab === "EXECUTIVE"
-    ? TEAM_MEMBERS.filter((m) => m.isExecutive)
-    : TEAM_MEMBERS;
+    ? membersList.filter((m) => m.isExecutive)
+    : membersList;
 
   return (
     <section id="leadership" className="py-24 bg-[#07111F] relative overflow-hidden border-t border-white/5">
