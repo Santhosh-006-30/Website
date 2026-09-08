@@ -1,6 +1,6 @@
 # Rotaract Club of Lead India Ahead (LIA) — Official Website & Admin CMS
 
-Official web platform for the **Rotaract Club of Lead India Ahead** (Rotary International District 3234). 
+Official web platform for the **Rotaract Club of Lead India Ahead** (Rotaract District 3206, Coimbatore). 
 Features a public-facing website built with high-performance glassmorphism aesthetics, paired with a custom, secure **Admin CMS** powered by Supabase.
 
 ---

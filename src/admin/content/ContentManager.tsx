@@ -29,7 +29,7 @@ const SECTION_CONFIGS: ContentSectionConfig[] = [
     label: 'Hero Section',
     icon: Sparkles,
     fields: [
-      { key: 'badge', label: 'Badge Text', type: 'text', placeholder: 'District 3234 • Rotary International' },
+      { key: 'badge', label: 'Badge Text', type: 'text', placeholder: 'Rotaract District 3206 • Rotary International' },
       { key: 'title', label: 'Main Headline', type: 'text', placeholder: 'Empowering Youth, Leading Positive Change' },
       { key: 'subtitle', label: 'Subtitle / Description', type: 'textarea', rows: 3, placeholder: 'Rotaract Club of Lead India Ahead is dedicated to youth leadership, community development, and humanitarian service.' },
       { key: 'cta_primary', label: 'Primary Button Label', type: 'text', placeholder: 'Explore Projects' },
@@ -88,8 +88,8 @@ const SECTION_CONFIGS: ContentSectionConfig[] = [
     label: 'Footer',
     icon: LayoutTemplate,
     fields: [
-      { key: 'tagline', label: 'Footer Tagline', type: 'text', placeholder: 'Rotaract Club of Lead India Ahead • RID 3234' },
-      { key: 'copyright', label: 'Copyright Notice', type: 'text', placeholder: '© 2024-2025 Rotaract Club of Lead India Ahead. All rights reserved.' },
+      { key: 'tagline', label: 'Footer Tagline', type: 'text', placeholder: 'Rotaract Club of Lead India Ahead • RID 3206' },
+      { key: 'copyright', label: 'Copyright Notice', type: 'text', placeholder: '© 2026–2027 Rotaract Club of Lead India Ahead. All rights reserved.' },
     ],
   },
 ];

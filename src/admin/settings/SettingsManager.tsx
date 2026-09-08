@@ -19,12 +19,6 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const YoutubeIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
-    <polygon points="10 15 15 12 10 9 10 15"/>
-  </svg>
-);
 import { adminGetAllSettings, adminUpsertSetting } from '../../services/content';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { showToast } from '../shared/Toast';
@@ -34,19 +28,29 @@ export const SettingsManager: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   const [settings, setSettings] = useState<Record<string, string>>({
+    // These defaults match 002_seed_data.sql and are only shown briefly before Supabase responds.
+    // They are overwritten once settings load from the database.
     club_name: 'Rotaract Club of Lead India Ahead',
-    rotary_district: 'District 3234',
-    rotary_year: '2024-25',
-    president_name: 'Rtr. Santhosh Kumar',
-    secretary_name: '',
-    contact_email: 'rotaractleadindiaahead@gmail.com',
-    contact_phone: '+91 98765 43210',
-    contact_address: 'Chennai, Tamil Nadu, India',
-    social_instagram: 'https://www.instagram.com/rotaract_lia/',
-    social_linkedin: 'https://www.linkedin.com/company/rotaract-club-of-lead-india-ahead/',
-    social_youtube: '',
-    seo_title: 'Rotaract Club of Lead India Ahead | RID 3234',
-    seo_description: 'Official website of the Rotaract Club of Lead India Ahead (RID 3234). Discover our community projects, youth leadership initiatives, and signature events.',
+    short_name: 'LIA',
+    established: '2012',
+    district: 'Rotaract District 3206',
+    club_id: '90062',
+    rotary_year: '2026–27',
+    current_theme: 'MAAYON',
+    president_name: 'Rtr. Hariharan B',
+    president_title: 'President',
+    president_term: '2026–27',
+    location: 'Coimbatore, Tamil Nadu, India',
+    sponsor_club: 'Rotary Club of Coimbatore Texcity',
+    email: 'racleadindiaahead2021@gmail.com',
+    phone_primary: '+91 63697 98451',
+    phone_secondary: '+91 75027 97780',
+    instagram_handle: '@rotaract.clubof.lia',
+    instagram_url: 'https://www.instagram.com/rotaract.clubof.lia/',
+    linkedin_url: 'https://www.linkedin.com/company/rotaract-club-of-lead-india-ahead/',
+    address: 'Coimbatore, Tamil Nadu, India',
+    seo_title: 'Rotaract Club of Lead India Ahead | MAAYON 2026–27',
+    seo_description: 'Official website of the Rotaract Club of Lead India Ahead (LIA), Rotaract District 3206, Coimbatore. Presidential theme: MAAYON 2026–27.',
   });
 
   useEffect(() => {
@@ -149,8 +153,8 @@ export const SettingsManager: React.FC = () => {
             </label>
             <input
               type="text"
-              value={settings.rotary_district}
-              onChange={(e) => handleFieldChange('rotary_district', e.target.value)}
+              value={settings.district ?? ''}
+              onChange={(e) => handleFieldChange('district', e.target.value)}
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
@@ -196,8 +200,8 @@ export const SettingsManager: React.FC = () => {
             </label>
             <input
               type="email"
-              value={settings.contact_email}
-              onChange={(e) => handleFieldChange('contact_email', e.target.value)}
+              value={settings.email ?? ''}
+              onChange={(e) => handleFieldChange('email', e.target.value)}
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
@@ -205,12 +209,25 @@ export const SettingsManager: React.FC = () => {
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
               <Phone className="w-3.5 h-3.5 text-slate-400" />
-              Phone / WhatsApp
+              Primary Phone / WhatsApp
             </label>
             <input
               type="text"
-              value={settings.contact_phone}
-              onChange={(e) => handleFieldChange('contact_phone', e.target.value)}
+              value={settings.phone_primary ?? ''}
+              onChange={(e) => handleFieldChange('phone_primary', e.target.value)}
+              className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-slate-400" />
+              Secondary Phone
+            </label>
+            <input
+              type="text"
+              value={settings.phone_secondary ?? ''}
+              onChange={(e) => handleFieldChange('phone_secondary', e.target.value)}
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
@@ -222,8 +239,8 @@ export const SettingsManager: React.FC = () => {
             </label>
             <input
               type="text"
-              value={settings.contact_address}
-              onChange={(e) => handleFieldChange('contact_address', e.target.value)}
+              value={settings.address ?? ''}
+              onChange={(e) => handleFieldChange('address', e.target.value)}
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
@@ -241,39 +258,41 @@ export const SettingsManager: React.FC = () => {
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
               <InstagramIcon className="w-3.5 h-3.5 text-pink-400" />
-              Instagram Page
+              Instagram Page URL
             </label>
             <input
               type="url"
-              value={settings.social_instagram}
-              onChange={(e) => handleFieldChange('social_instagram', e.target.value)}
+              value={settings.instagram_url ?? ''}
+              onChange={(e) => handleFieldChange('instagram_url', e.target.value)}
+              placeholder="https://www.instagram.com/rotaract.clubof.lia/"
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
 
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
-              <LinkedinIcon className="w-3.5 h-3.5 text-sky-400" />
-              LinkedIn Page
+              <InstagramIcon className="w-3.5 h-3.5 text-pink-400" />
+              Instagram Handle (@)
             </label>
             <input
-              type="url"
-              value={settings.social_linkedin}
-              onChange={(e) => handleFieldChange('social_linkedin', e.target.value)}
+              type="text"
+              value={settings.instagram_handle ?? ''}
+              onChange={(e) => handleFieldChange('instagram_handle', e.target.value)}
+              placeholder="@rotaract.clubof.lia"
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
 
           <div className="sm:col-span-2">
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center gap-1.5">
-              <YoutubeIcon className="w-3.5 h-3.5 text-rose-400" />
-              YouTube Channel
+              <LinkedinIcon className="w-3.5 h-3.5 text-sky-400" />
+              LinkedIn Page URL
             </label>
             <input
               type="url"
-              value={settings.social_youtube}
-              onChange={(e) => handleFieldChange('social_youtube', e.target.value)}
-              placeholder="https://youtube.com/@..."
+              value={settings.linkedin_url ?? ''}
+              onChange={(e) => handleFieldChange('linkedin_url', e.target.value)}
+              placeholder="https://www.linkedin.com/company/rotaract-club-of-lead-india-ahead/"
               className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
             />
           </div>
