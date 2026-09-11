@@ -7,12 +7,16 @@ import {
 import { adminGetEventStats } from '../services/events';
 import { adminGetPostStats } from '../services/posts';
 import { adminGetGalleryStats } from '../services/gallery';
+import { adminGetProjectStats } from '../services/projects';
+import { adminGetTeamStats } from '../services/team';
 import { LoadingSpinner } from './shared/LoadingSpinner';
 
 interface DashboardStats {
   events: { total: number; published: number; draft: number; archived: number };
   posts: { total: number; published: number; draft: number };
   gallery: { total: number; albums: number };
+  projects: { total: number; published: number; featured: number };
+  team: { total: number; published: number };
 }
 
 interface StatCardProps {
@@ -86,12 +90,14 @@ export function AdminDashboard() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const [events, posts, gallery] = await Promise.all([
+        const [events, posts, gallery, projects, team] = await Promise.all([
           adminGetEventStats(),
           adminGetPostStats(),
           adminGetGalleryStats(),
+          adminGetProjectStats(),
+          adminGetTeamStats(),
         ]);
-        setStats({ events, posts, gallery });
+        setStats({ events, posts, gallery, projects, team });
       } catch (err) {
         console.error('Dashboard stats error:', err);
       } finally {
@@ -162,16 +168,16 @@ export function AdminDashboard() {
         />
         <StatCard
           label="Projects"
-          value="—"
-          sub="View all projects"
+          value={stats?.projects.total ?? 0}
+          sub={`${stats?.projects.published ?? 0} published`}
           icon={<FolderKanban className="w-5 h-5" />}
           to="/admin/projects"
           accentColor="#f472b6"
         />
         <StatCard
           label="Team Members"
-          value="—"
-          sub="Leadership board"
+          value={stats?.team.total ?? 0}
+          sub={`${stats?.team.published ?? 0} published`}
           icon={<Users className="w-5 h-5" />}
           to="/admin/team"
           accentColor="#2dd4bf"

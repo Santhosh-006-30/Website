@@ -96,3 +96,18 @@ export async function adminReorderTeamMembers(
       .eq('id', member.id);
   }
 }
+
+export async function adminGetTeamStats(): Promise<{
+  total: number;
+  published: number;
+}> {
+  if (!supabase) return { total: 0, published: 0 };
+  const { data, error } = await supabase.from('team_members').select('published');
+  if (error) return { total: 0, published: 0 };
+  const members = data ?? [];
+  return {
+    total: members.length,
+    published: members.filter((m) => m.published).length,
+  };
+}
+

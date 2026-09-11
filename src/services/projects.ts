@@ -134,3 +134,20 @@ export async function adminDeleteProjectImage(id: string): Promise<void> {
   const { error } = await supabase.from('project_images').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export async function adminGetProjectStats(): Promise<{
+  total: number;
+  published: number;
+  featured: number;
+}> {
+  if (!supabase) return { total: 0, published: 0, featured: 0 };
+  const { data, error } = await supabase.from('projects').select('status, featured');
+  if (error) return { total: 0, published: 0, featured: 0 };
+  const projects = data ?? [];
+  return {
+    total: projects.length,
+    published: projects.filter((p) => p.status === 'published').length,
+    featured: projects.filter((p) => p.featured).length,
+  };
+}
+
