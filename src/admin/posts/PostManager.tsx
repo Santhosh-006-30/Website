@@ -32,6 +32,7 @@ export const PostManager: React.FC = () => {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<ContentStatus | 'all'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -47,6 +48,7 @@ export const PostManager: React.FC = () => {
         page: currentPage,
         pageSize,
         status: statusFilter,
+        category: categoryFilter !== 'all' ? categoryFilter : undefined,
         search: search.trim() || undefined,
       });
       setPosts(res.data);
@@ -57,7 +59,7 @@ export const PostManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, statusFilter, search]);
+  }, [currentPage, statusFilter, categoryFilter, search]);
 
   useEffect(() => {
     fetchPosts();
@@ -167,14 +169,31 @@ export const PostManager: React.FC = () => {
           />
         </form>
 
-        <div className="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          {(['all', 'published', 'draft', 'archived'] as const).map((st) => (
-            <button
-              key={st}
-              onClick={() => {
-                setStatusFilter(st);
-                setCurrentPage(1);
-              }}
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+          <select
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="bg-[#07111F]/80 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-[#D7B65A]/60 cursor-pointer"
+          >
+            <option value="all">All Categories</option>
+            <option value="Club News">Club News</option>
+            <option value="Events">Events</option>
+            <option value="Community">Community</option>
+            <option value="Achievements">Achievements</option>
+            <option value="Announcements">Announcements</option>
+          </select>
+
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+            {(['all', 'published', 'draft', 'archived'] as const).map((st) => (
+              <button
+                key={st}
+                onClick={() => {
+                  setStatusFilter(st);
+                  setCurrentPage(1);
+                }}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all cursor-pointer whitespace-nowrap ${
                 statusFilter === st
                   ? 'bg-[#D7B65A] text-[#07111F] shadow-sm'
@@ -185,6 +204,7 @@ export const PostManager: React.FC = () => {
             </button>
           ))}
         </div>
+      </div>
       </div>
 
       {/* Posts Table */}

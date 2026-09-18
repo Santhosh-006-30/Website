@@ -15,6 +15,8 @@ const EventDetailPage = lazy(() => import('./components/EventDetailPage').then(m
 const ProjectsPage = lazy(() => import('./components/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
 const ProjectDetailPage = lazy(() => import('./components/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
 const GalleryPage = lazy(() => import('./components/GalleryPage').then(m => ({ default: m.GalleryPage })));
+const PostsPage = lazy(() => import('./components/PostsPage').then(m => ({ default: m.PostsPage })));
+const PostDetailPage = lazy(() => import('./components/PostDetailPage').then(m => ({ default: m.PostDetailPage })));
 const NotFoundPage = lazy(() => import('./components/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 const RouteLoadingFallback = () => (
@@ -38,6 +40,8 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/projects" element={<ProjectsPage />} />
               <Route path="/projects/:slug" element={<ProjectDetailPage />} />
               <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/posts" element={<PostsPage />} />
+              <Route path="/posts/:slug" element={<PostDetailPage />} />
               <Route path="/" element={<App />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

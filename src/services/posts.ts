@@ -16,16 +16,32 @@ export async function getPublishedPosts(): Promise<Post[]> {
   return data ?? [];
 }
 
+export async function getPublishedPostBySlug(slug: string): Promise<Post | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .single();
+  if (error) {
+    console.error('[posts] getPublishedPostBySlug error:', error.message);
+    return null;
+  }
+  return data;
+}
+
 export async function adminGetPosts(
-  options: PaginationOptions & { status?: ContentStatus | 'all'; search?: string }
+  options: PaginationOptions & { status?: ContentStatus | 'all'; category?: string; search?: string }
 ): Promise<PaginatedResult<Post>> {
   if (!supabase) throw new Error('Supabase not configured');
-  const { page, pageSize, status, search } = options;
+  const { page, pageSize, status, category, search } = options;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
   let query = supabase.from('posts').select('*', { count: 'exact' });
   if (status && status !== 'all') query = query.eq('status', status);
+  if (category && category !== 'all') query = query.eq('category', category);
   if (search) query = query.ilike('title', `%${search}%`);
 
   const { data, error, count } = await query
