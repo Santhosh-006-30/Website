@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   LayoutTemplate, Save, Sparkles, 
   Layers, Compass, HeartHandshake 
@@ -100,11 +100,7 @@ export const ContentManager: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [contentValues, setContentValues] = useState<Record<string, Record<string, string>>>({});
 
-  useEffect(() => {
-    loadAllContent();
-  }, []);
-
-  const loadAllContent = async () => {
+  const loadAllContent = useCallback(async () => {
     setLoading(true);
     try {
       const items = await adminGetAllContent();
@@ -119,7 +115,11 @@ export const ContentManager: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void loadAllContent();
+  }, [loadAllContent]);
 
   const handleChange = (section: string, key: string, value: string) => {
     setContentValues((prev) => ({

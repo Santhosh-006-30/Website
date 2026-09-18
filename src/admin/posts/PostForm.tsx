@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -60,13 +60,7 @@ export const PostForm: React.FC = () => {
     },
   });
 
-  useEffect(() => {
-    if (isEdit && id) {
-      loadPost(id);
-    }
-  }, [id, isEdit]);
-
-  const loadPost = async (postId: string) => {
+  const loadPost = useCallback(async (postId: string) => {
     setLoading(true);
     try {
       const post = await adminGetPost(postId);
@@ -94,7 +88,13 @@ export const PostForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [editor, navigate]);
+
+  useEffect(() => {
+    if (isEdit && id) {
+      void loadPost(id);
+    }
+  }, [id, isEdit, loadPost]);
 
   // Sync editor content when editor becomes ready if editing
   useEffect(() => {

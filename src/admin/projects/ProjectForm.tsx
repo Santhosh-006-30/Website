@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Save, Upload, FolderGit2, Trash2, Tag, 
@@ -42,13 +42,7 @@ export const ProjectForm: React.FC = () => {
   const [newMetricLabel, setNewMetricLabel] = useState('');
   const [newMetricValue, setNewMetricValue] = useState('');
 
-  useEffect(() => {
-    if (isEdit && id) {
-      loadProject(id);
-    }
-  }, [id, isEdit]);
-
-  const loadProject = async (projectId: string) => {
+  const loadProject = useCallback(async (projectId: string) => {
     setLoading(true);
     try {
       const project = await adminGetProject(projectId);
@@ -77,7 +71,13 @@ export const ProjectForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (isEdit && id) {
+      void loadProject(id);
+    }
+  }, [id, isEdit, loadProject]);
 
   const generateSlug = (text: string) => {
     return text

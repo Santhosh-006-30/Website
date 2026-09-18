@@ -81,7 +81,7 @@ export const TeamManager: React.FC = () => {
           : `Published "${member.name}" to public site`
       );
       fetchMembers();
-    } catch (err: any) {
+    } catch {
       showToast.error('Failed to update status');
     }
   };

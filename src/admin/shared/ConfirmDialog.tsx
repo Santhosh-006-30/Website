@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 
 interface ConfirmDialogProps {
@@ -25,10 +26,18 @@ export function ConfirmDialog({
   loading = false,
   isLoading,
 }: ConfirmDialogProps) {
-  if (!isOpen) return null;
-
   const isDanger = confirmVariant ? confirmVariant === 'danger' : danger;
   const isBusy = isLoading !== undefined ? isLoading : loading;
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen && !isBusy) onCancel();
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [isOpen, isBusy, onCancel]);
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -36,6 +45,10 @@ export function ConfirmDialog({
       style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
     >
       <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-message"
         className="w-full max-w-sm rounded-2xl p-6"
         style={{
           background: 'rgba(10, 20, 38, 0.98)',
@@ -54,8 +67,8 @@ export function ConfirmDialog({
             />
           </div>
           <div>
-            <h3 className="text-slate-100 font-semibold text-base mb-1">{title}</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">{message}</p>
+            <h3 id="confirm-dialog-title" className="text-slate-100 font-semibold text-base mb-1">{title}</h3>
+            <p id="confirm-dialog-message" className="text-slate-400 text-sm leading-relaxed">{message}</p>
           </div>
         </div>
 

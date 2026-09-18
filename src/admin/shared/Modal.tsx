@@ -47,6 +47,9 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
       onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
         className={`w-full ${sizeClasses[size]} max-h-[90vh] flex flex-col rounded-2xl`}
         style={{
           background: 'rgba(10, 20, 38, 0.97)',
@@ -58,8 +61,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md', footer }:
         <div className="flex items-center justify-between p-6 border-b border-white/10 flex-shrink-0">
           <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-colors"
+            aria-label="Close modal"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, Save, Upload, User, Award, FileText, 
@@ -41,7 +41,7 @@ export const TeamMemberForm: React.FC = () => {
     bio: '',
     profile_image_url: '',
     letter_image_url: '',
-    term: '2024-25',
+    term: '2026–27',
     college_company: '',
     blood_group: '',
     is_executive: true,
@@ -51,13 +51,7 @@ export const TeamMemberForm: React.FC = () => {
     linkedin_url: '',
   });
 
-  useEffect(() => {
-    if (isEdit && id) {
-      loadMember(id);
-    }
-  }, [id, isEdit]);
-
-  const loadMember = async (memberId: string) => {
+  const loadMember = useCallback(async (memberId: string) => {
     setLoading(true);
     try {
       const member = await adminGetTeamMember(memberId);
@@ -68,7 +62,7 @@ export const TeamMemberForm: React.FC = () => {
           bio: member.bio || '',
           profile_image_url: member.profile_image_url || '',
           letter_image_url: member.letter_image_url || '',
-          term: member.term || '2024-25',
+          term: member.term || '2026–27',
           college_company: member.college_company || '',
           blood_group: member.blood_group || '',
           is_executive: member.is_executive,
@@ -84,7 +78,14 @@ export const TeamMemberForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (isEdit && id) {
+      void loadMember(id);
+    }
+  }, [id, isEdit, loadMember]);
+
 
   const handleProfileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -349,7 +350,7 @@ export const TeamMemberForm: React.FC = () => {
                   type="text"
                   value={formData.term}
                   onChange={(e) => setFormData({ ...formData, term: e.target.value })}
-                  placeholder="e.g. 2024-25"
+                  placeholder="e.g. 2026–27"
                   className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
                 />
               </div>
