@@ -5,6 +5,7 @@ import './index.css';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { AnalyticsTracker } from './components/AnalyticsTracker';
 
 // Route-level code splitting: isolate admin CMS, heavy public subpages, and editor bundles
 const AdminApp = lazy(() => import('./admin/AdminApp').then(m => ({ default: m.AdminApp })));
@@ -29,6 +30,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
+        <AnalyticsTracker />
         <AuthProvider>
           <Suspense fallback={<RouteLoadingFallback />}>
             <Routes>

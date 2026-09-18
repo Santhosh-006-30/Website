@@ -24,6 +24,7 @@ import { ProjectPreview } from './preview/ProjectPreview';
 import { CareerPreview } from './preview/CareerPreview';
 import { CareersManager } from './careers/CareersManager';
 import { CareerForm } from './careers/CareerForm';
+import { AnalyticsDashboard } from './analytics/AnalyticsDashboard';
 import { SEO } from '../components/SEO';
 
 export const AdminApp: React.FC = () => {
@@ -78,6 +79,9 @@ export const AdminApp: React.FC = () => {
 
         {/* Site Settings */}
         <Route path="settings" element={<SettingsManager />} />
+
+        {/* Privacy-Conscious Analytics */}
+        <Route path="analytics" element={<AnalyticsDashboard />} />
 
         {/* Content Previews */}
         <Route path="preview/event/:id" element={<EventPreview />} />
