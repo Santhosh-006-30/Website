@@ -19,11 +19,14 @@ const LinkedinIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-import { adminGetAllSettings, adminUpsertSetting } from '../../services/content';
+import { adminGetAllSettings, adminUpsertSettings } from '../../services/content';
+import { useAuth } from '../../contexts/AuthContext';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { showToast } from '../shared/Toast';
 
 export const SettingsManager: React.FC = () => {
+  const { isAdmin, isSuperAdmin } = useAuth();
+  const canEdit = isAdmin || isSuperAdmin;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -53,39 +56,65 @@ export const SettingsManager: React.FC = () => {
     seo_description: 'Official website of the Rotaract Club of Lead India Ahead (LIA), Rotaract District 3206, Coimbatore. Presidential theme: MAAYON 2026–27.',
   });
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
+  const loadSettings = React.useCallback(async () => {
     setLoading(true);
     try {
       const items = await adminGetAllSettings();
-      const mapped: Record<string, string> = { ...settings };
-      for (const item of items) {
-        if (item.value !== null) {
-          mapped[item.key] = item.value;
+      setSettings((prev) => {
+        const mapped: Record<string, string> = { ...prev };
+        for (const item of items) {
+          if (item.value !== null) {
+            mapped[item.key] = item.value;
+          }
         }
-      }
-      setSettings(mapped);
+        return mapped;
+      });
     } catch (err: any) {
       showToast.error(err.message || 'Failed to load settings');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void loadSettings();
+  }, [loadSettings]);
 
   const handleFieldChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
+  const validateForm = (): boolean => {
+    if (!settings.club_name.trim()) {
+      showToast.error('Club Name cannot be empty');
+      return false;
+    }
+    if (settings.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(settings.email)) {
+      showToast.error('Please enter a valid contact email address');
+      return false;
+    }
+    if (settings.instagram_url && !/^https?:\/\//i.test(settings.instagram_url)) {
+      showToast.error('Instagram URL must start with http:// or https://');
+      return false;
+    }
+    if (settings.linkedin_url && !/^https?:\/\//i.test(settings.linkedin_url)) {
+      showToast.error('LinkedIn URL must start with http:// or https://');
+      return false;
+    }
+    return true;
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canEdit) {
+      showToast.error('You do not have permission to modify global settings');
+      return;
+    }
+    if (!validateForm()) return;
+
     setSaving(true);
     try {
-      for (const [key, value] of Object.entries(settings)) {
-        await adminUpsertSetting(key, value);
-      }
+      await adminUpsertSettings(settings);
       showToast.success('Global site settings updated successfully');
     } catch (err: any) {
       showToast.error(err.message || 'Failed to save settings');
@@ -119,13 +148,19 @@ export const SettingsManager: React.FC = () => {
 
         <button
           type="submit"
-          disabled={saving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#D7B65A] to-[#B3933B] text-[#07111F] hover:brightness-110 shadow-lg shadow-[#D7B65A]/20 disabled:opacity-50 transition-all cursor-pointer"
+          disabled={saving || !canEdit}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#D7B65A] to-[#B3933B] text-[#07111F] hover:brightness-110 shadow-lg shadow-[#D7B65A]/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
         >
           {saving ? <LoadingSpinner size="sm" /> : <Save className="w-4 h-4" />}
-          Save All Settings
+          {canEdit ? 'Save All Settings' : 'Read Only Mode'}
         </button>
       </div>
+
+      {!canEdit && (
+        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+          <span>Administrator privileges required to modify global site settings.</span>
+        </div>
+      )}
 
       {/* 1. Club Identity */}
       <div className="glass-panel p-6 rounded-2xl border border-white/10 bg-[#0c192e]/60 space-y-4">
