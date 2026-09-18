@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar, FileText, FolderKanban, Image, Users, Plus,
-  TrendingUp, Clock, ArrowRight, Activity, ShieldCheck,
-  Archive, Sparkles, Briefcase
+  TrendingUp, ArrowRight, Activity, ShieldCheck,
+  Sparkles, Briefcase
 } from 'lucide-react';
 import { adminGetEventStats } from '../services/events';
 import { adminGetPostStats } from '../services/posts';
@@ -11,18 +11,20 @@ import { adminGetGalleryStats } from '../services/gallery';
 import { adminGetProjectStats } from '../services/projects';
 import { adminGetTeamStats } from '../services/team';
 import { adminGetCareerStats } from '../services/careers';
+import { adminGetUserStats, type UserStats } from '../services/users';
 import { getRecentActivity } from '../services/audit';
 import type { AuditLog } from '../types/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from './shared/LoadingSpinner';
 
 interface DashboardStats {
-  events: { total: number; published: number; draft: number; archived: number };
-  posts: { total: number; published: number; draft: number };
-  gallery: { total: number; albums: number };
-  projects: { total: number; published: number; featured: number };
-  team: { total: number; published: number };
-  careers: { total: number; published: number; draft: number; archived: number; expired: number };
+  events: { total: number; published: number; draft: number; archived: number } | null;
+  posts: { total: number; published: number; draft: number } | null;
+  gallery: { total: number; albums: number } | null;
+  projects: { total: number; published: number; featured: number } | null;
+  team: { total: number; published: number } | null;
+  careers: { total: number; published: number; draft: number; archived: number; expired: number } | null;
+  users: UserStats | null;
 }
 
 interface StatCardProps {
@@ -98,16 +100,17 @@ export function AdminDashboard() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const [events, posts, gallery, projects, team, careers, logs] = await Promise.all([
-          adminGetEventStats(),
-          adminGetPostStats(),
-          adminGetGalleryStats(),
-          adminGetProjectStats(),
-          adminGetTeamStats(),
-          adminGetCareerStats(),
-          getRecentActivity(6),
+        const [events, posts, gallery, projects, team, careers, users, logs] = await Promise.all([
+          adminGetEventStats().catch(() => null),
+          adminGetPostStats().catch(() => null),
+          adminGetGalleryStats().catch(() => null),
+          adminGetProjectStats().catch(() => null),
+          adminGetTeamStats().catch(() => null),
+          adminGetCareerStats().catch(() => null),
+          adminGetUserStats().catch(() => null),
+          getRecentActivity(6).catch(() => []),
         ]);
-        setStats({ events, posts, gallery, projects, team, careers });
+        setStats({ events, posts, gallery, projects, team, careers, users });
         setRecentLogs(logs);
       } catch (err) {
         console.error('Dashboard stats error:', err);
@@ -132,9 +135,9 @@ export function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 mb-1 flex items-center gap-2.5">
-            Dashboard V2
+            Dashboard V3
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-mono">
-              CMS V2
+              Governance CMS
             </span>
           </h1>
           <p className="text-slate-400 text-sm">
@@ -162,74 +165,66 @@ export function AdminDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Events"
-          value={stats?.events.total ?? 0}
-          sub={`${stats?.events.published ?? 0} live • ${stats?.events.archived ?? 0} archived`}
+          value={stats?.events ? stats.events.total : 'Unavailable'}
+          sub={stats?.events ? `${stats.events.published} live • ${stats.events.archived} archived` : 'Database unavailable'}
           icon={<Calendar className="w-5 h-5" />}
           to="/admin/events"
         />
         <StatCard
           label="Published Events"
-          value={stats?.events.published ?? 0}
-          sub="Live on public website"
+          value={stats?.events ? stats.events.published : 'Unavailable'}
+          sub={stats?.events ? 'Live on public website' : 'Database unavailable'}
           icon={<TrendingUp className="w-5 h-5" />}
           to="/admin/events"
           accentColor="#34d399"
         />
         <StatCard
-          label="Draft Events"
-          value={stats?.events.draft ?? 0}
-          sub="In preparation"
-          icon={<Clock className="w-5 h-5" />}
-          to="/admin/events"
-          accentColor="#fbbf24"
-        />
-        <StatCard
           label="Articles / Posts"
-          value={stats?.posts.total ?? 0}
-          sub={`${stats?.posts.published ?? 0} published`}
+          value={stats?.posts ? stats.posts.total : 'Unavailable'}
+          sub={stats?.posts ? `${stats.posts.published} published` : 'Database unavailable'}
           icon={<FileText className="w-5 h-5" />}
           to="/admin/posts"
           accentColor="#60a5fa"
         />
         <StatCard
           label="Gallery Images"
-          value={stats?.gallery.total ?? 0}
-          sub={`${stats?.gallery.albums ?? 0} photo albums`}
+          value={stats?.gallery ? stats.gallery.total : 'Unavailable'}
+          sub={stats?.gallery ? `${stats.gallery.albums} photo albums` : 'Database unavailable'}
           icon={<Image className="w-5 h-5" />}
           to="/admin/gallery"
           accentColor="#a78bfa"
         />
         <StatCard
           label="Initiatives & Projects"
-          value={stats?.projects.total ?? 0}
-          sub={`${stats?.projects.featured ?? 0} flagship`}
+          value={stats?.projects ? stats.projects.total : 'Unavailable'}
+          sub={stats?.projects ? `${stats.projects.featured} flagship` : 'Database unavailable'}
           icon={<FolderKanban className="w-5 h-5" />}
           to="/admin/projects"
           accentColor="#f472b6"
         />
         <StatCard
           label="Team Directory"
-          value={stats?.team.total ?? 0}
-          sub={`${stats?.team.published ?? 0} published`}
+          value={stats?.team ? stats.team.total : 'Unavailable'}
+          sub={stats?.team ? `${stats.team.published} published` : 'Database unavailable'}
           icon={<Users className="w-5 h-5" />}
           to="/admin/team"
           accentColor="#2dd4bf"
         />
         <StatCard
           label="Careers & Opps"
-          value={stats?.careers.total ?? 0}
-          sub={`${stats?.careers.published ?? 0} published • ${stats?.careers.expired ?? 0} expired`}
+          value={stats?.careers ? stats.careers.total : 'Unavailable'}
+          sub={stats?.careers ? `${stats.careers.published} live • ${stats.careers.expired} expired` : 'Database unavailable'}
           icon={<Briefcase className="w-5 h-5" />}
           to="/admin/careers"
           accentColor="#38bdf8"
         />
         <StatCard
-          label="Archived Events"
-          value={stats?.events.archived ?? 0}
-          sub="Preserved records"
-          icon={<Archive className="w-5 h-5" />}
-          to="/admin/events"
-          accentColor="#94a3b8"
+          label="User Accounts"
+          value={stats?.users ? stats.users.total : 'Unavailable'}
+          sub={stats?.users ? `${stats.users.superAdmins + stats.users.admins} admins • ${stats.users.editors} editors` : 'Governance unavailable'}
+          icon={<ShieldCheck className="w-5 h-5" />}
+          to="/admin/users"
+          accentColor="#fbbf24"
         />
       </div>
 

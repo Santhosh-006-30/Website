@@ -41,6 +41,48 @@ export const PostManager: React.FC = () => {
     targetStatus: 'published' | 'draft' | 'archived';
   } | null>(null);
 
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [pendingBulkAction, setPendingBulkAction] = useState<'publish' | 'archive' | null>(null);
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === posts.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(posts.map((p) => p.id));
+    }
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const executeBulkAction = async () => {
+    if (!pendingBulkAction || selectedIds.length === 0) return;
+    setBulkProcessing(true);
+    try {
+      let count = 0;
+      for (const id of selectedIds) {
+        if (pendingBulkAction === 'publish') {
+          await adminPublishPost(id);
+        } else if (pendingBulkAction === 'archive') {
+          await adminArchivePost(id);
+        }
+        count++;
+      }
+      showToast.success(`Successfully ${pendingBulkAction}ed ${count} post(s)`);
+      setSelectedIds([]);
+      setPendingBulkAction(null);
+      fetchPosts();
+    } catch (err: any) {
+      showToast.error(err.message || `Failed to ${pendingBulkAction} selected posts`);
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     try {
@@ -203,9 +245,41 @@ export const PostManager: React.FC = () => {
               {st}
             </button>
           ))}
+          </div>
         </div>
       </div>
-      </div>
+
+      {/* Bulk Action Bar */}
+      {canWrite && selectedIds.length > 0 && (
+        <div className="glass-panel p-3 px-4 rounded-xl border border-[#D7B65A]/30 bg-[#0c192e]/90 flex items-center justify-between gap-4 animate-fadeIn shadow-lg">
+          <div className="flex items-center gap-2 text-xs text-white">
+            <span className="font-bold text-[#D7B65A] bg-[#D7B65A]/10 px-2 py-0.5 rounded border border-[#D7B65A]/20">
+              {selectedIds.length}
+            </span>{' '}
+            post(s) selected
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPendingBulkAction('publish')}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors cursor-pointer"
+            >
+              Bulk Publish
+            </button>
+            <button
+              onClick={() => setPendingBulkAction('archive')}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 transition-colors cursor-pointer"
+            >
+              Bulk Archive
+            </button>
+            <button
+              onClick={() => setSelectedIds([])}
+              className="px-2.5 py-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              Clear Selection
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Posts Table */}
       <div className="glass-panel rounded-2xl border border-white/10 bg-[#0c192e]/40 overflow-hidden shadow-xl">
@@ -230,6 +304,17 @@ export const PostManager: React.FC = () => {
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-[#07111F]/70 text-xs uppercase tracking-wider text-slate-400 border-b border-white/10">
                 <tr>
+                  {canWrite && (
+                    <th className="py-3.5 px-3 w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={posts.length > 0 && selectedIds.length === posts.length}
+                        onChange={toggleSelectAll}
+                        className="rounded border-white/20 bg-white/5 text-[#D7B65A] focus:ring-[#D7B65A] cursor-pointer"
+                        title="Select all on this page"
+                      />
+                    </th>
+                  )}
                   <th className="py-3.5 px-4 font-semibold">Post</th>
                   <th className="py-3.5 px-4 font-semibold">Category</th>
                   <th className="py-3.5 px-4 font-semibold">Date</th>
@@ -242,8 +327,20 @@ export const PostManager: React.FC = () => {
                 {posts.map((post) => (
                   <tr
                     key={post.id}
-                    className="hover:bg-white/[0.03] transition-colors group"
+                    className={`hover:bg-white/[0.03] transition-colors group ${
+                      selectedIds.includes(post.id) ? 'bg-[#D7B65A]/5' : ''
+                    }`}
                   >
+                    {canWrite && (
+                      <td className="py-4 px-3 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(post.id)}
+                          onChange={() => toggleSelectOne(post.id)}
+                          className="rounded border-white/20 bg-white/5 text-[#D7B65A] focus:ring-[#D7B65A] cursor-pointer"
+                        />
+                      </td>
+                    )}
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
                         {post.cover_image_url ? (
@@ -442,6 +539,18 @@ export const PostManager: React.FC = () => {
         isLoading={deleting}
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
+      />
+
+      {/* Bulk Action Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingBulkAction)}
+        title={pendingBulkAction === 'publish' ? 'Bulk Publish Posts' : 'Bulk Archive Posts'}
+        message={`Are you sure you want to ${pendingBulkAction} the ${selectedIds.length} selected post(s)?`}
+        confirmLabel={bulkProcessing ? 'Processing...' : (pendingBulkAction === 'publish' ? 'Publish All' : 'Archive All')}
+        confirmVariant={pendingBulkAction === 'publish' ? 'primary' : 'warning'}
+        isLoading={bulkProcessing}
+        onConfirm={executeBulkAction}
+        onCancel={() => setPendingBulkAction(null)}
       />
     </div>
   );

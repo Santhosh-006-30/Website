@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, ExternalLink, Shield } from 'lucide-react';
+import { ChevronRight, ExternalLink, Shield, Search } from 'lucide-react';
 import { MobileMenuButton } from './AdminSidebar';
 import { useAuth } from '../contexts/AuthContext';
+import { GlobalSearchModal } from './shared/GlobalSearchModal';
 
 interface AdminHeaderProps {
   onMobileMenuOpen: () => void;
@@ -57,6 +59,7 @@ function getBreadcrumbs(pathname: string): { label: string; to: string }[] {
 export function AdminHeader({ onMobileMenuOpen }: AdminHeaderProps) {
   const location = useLocation();
   const { profile, role } = useAuth();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const breadcrumbs = getBreadcrumbs(location.pathname);
 
   return (
@@ -92,6 +95,19 @@ export function AdminHeader({ onMobileMenuOpen }: AdminHeaderProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-3 flex-shrink-0">
+        {/* Global Search Trigger */}
+        <button
+          onClick={() => setIsSearchOpen(true)}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 hover:text-white transition-colors cursor-pointer"
+          title="Search CMS (Ctrl+K)"
+        >
+          <Search className="w-3.5 h-3.5 text-[#D7B65A]" />
+          <span className="hidden md:inline">Search CMS...</span>
+          <kbd className="hidden lg:inline-block text-[9px] bg-white/10 border border-white/10 px-1.5 py-0.5 rounded text-slate-400 font-mono">
+            ⌘K
+          </kbd>
+        </button>
+
         {/* View public site */}
         <a
           href="/"
@@ -136,6 +152,8 @@ export function AdminHeader({ onMobileMenuOpen }: AdminHeaderProps) {
           </Link>
         )}
       </div>
+
+      <GlobalSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   );
 }
