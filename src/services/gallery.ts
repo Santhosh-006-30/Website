@@ -19,6 +19,27 @@ export async function getPublishedGalleryImages(): Promise<GalleryImage[]> {
   });
 }
 
+export interface AlbumWithImages extends GalleryAlbum {
+  images: GalleryImage[];
+}
+
+export async function getPublishedAlbumsWithImages(): Promise<AlbumWithImages[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('gallery_albums')
+    .select('*, gallery_images(id, image_url, title, caption, category, date, featured, sort_order, created_at, album_id, storage_path)')
+    .eq('published', true)
+    .order('sort_order', { ascending: true });
+  if (error) {
+    console.error('[gallery] getPublishedAlbumsWithImages error:', error.message);
+    return [];
+  }
+  return (data ?? []).map((album: any) => ({
+    ...album,
+    images: (album.gallery_images ?? []).sort((a: GalleryImage, b: GalleryImage) => a.sort_order - b.sort_order),
+  }));
+}
+
 export async function getPublishedAlbums(): Promise<GalleryAlbum[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
@@ -79,7 +100,7 @@ export async function adminCreateAlbum(
     action: 'CREATE',
     entityType: 'gallery_album',
     entityId: data.id,
-    entityName: data.title,
+    entityName: data.name,
   });
   return data;
 }
@@ -100,7 +121,7 @@ export async function adminUpdateAlbum(
     action: 'UPDATE',
     entityType: 'gallery_album',
     entityId: data.id,
-    entityName: data.title,
+    entityName: data.name,
     metadata: { fields: Object.keys(updates) },
   });
   return data;

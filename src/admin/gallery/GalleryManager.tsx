@@ -229,6 +229,18 @@ export const GalleryManager: React.FC = () => {
     }
   };
 
+  // Set Album Cover
+  const handleSetAlbumCover = async (imageUrl: string) => {
+    if (!selectedAlbum) return;
+    try {
+      await adminUpdateAlbum(selectedAlbum.id, { cover_image_url: imageUrl });
+      showToast.success('Album cover updated');
+      loadAlbumsAndEvents();
+    } catch (err: any) {
+      showToast.error(err.message || 'Failed to update album cover');
+    }
+  };
+
   const selectedAlbum = albums.find((a) => a.id === selectedAlbumId);
 
   return (
@@ -417,8 +429,25 @@ export const GalleryManager: React.FC = () => {
 
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-between">
-                      {/* Top Action: Featured star */}
-                      <div className="flex justify-end">
+                      {/* Top Action: Featured star & Cover Photo */}
+                      <div className="flex justify-end items-center gap-1.5">
+                        {selectedAlbum && (
+                          <button
+                            onClick={() => handleSetAlbumCover(image.image_url)}
+                            className={`p-1.5 rounded-lg backdrop-blur-md transition-colors cursor-pointer ${
+                              selectedAlbum.cover_image_url === image.image_url
+                                ? 'bg-[#D7B65A] text-[#07111F]'
+                                : 'bg-black/50 text-white hover:bg-black/80'
+                            }`}
+                            title={
+                              selectedAlbum.cover_image_url === image.image_url
+                                ? 'Current album cover'
+                                : 'Set as album cover'
+                            }
+                          >
+                            <ImageIcon className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleToggleImageFeatured(image)}
                           className={`p-1.5 rounded-lg backdrop-blur-md transition-colors cursor-pointer ${

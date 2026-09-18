@@ -101,9 +101,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-1 xl:space-x-2 bg-white/[0.03] border border-white/10 backdrop-blur-md px-3 xl:px-4 py-1.5 rounded-full shadow-inner">
             {navItems.map((item) => {
               const isCareers = Boolean(item.path);
+              const isSubpageActive =
+                (item.targetId === "events" && location.pathname.startsWith("/events")) ||
+                (item.targetId === "projects" && location.pathname.startsWith("/projects")) ||
+                (item.targetId === "gallery" && location.pathname.startsWith("/gallery"));
               const isActive = isCareers
                 ? location.pathname.startsWith("/careers")
-                : isHomepage && activeSection === item.targetId;
+                : isSubpageActive || (isHomepage && activeSection === item.targetId);
               const href = isCareers
                 ? item.path!
                 : isHomepage
@@ -202,9 +206,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
 
               {navItems.map((item) => {
                 const isCareers = Boolean(item.path);
+                const isSubpageActive =
+                  (item.targetId === "events" && location.pathname.startsWith("/events")) ||
+                  (item.targetId === "projects" && location.pathname.startsWith("/projects")) ||
+                  (item.targetId === "gallery" && location.pathname.startsWith("/gallery"));
                 const isActive = isCareers
                   ? location.pathname.startsWith("/careers")
-                  : isHomepage && activeSection === item.targetId;
+                  : isSubpageActive || (isHomepage && activeSection === item.targetId);
                 const href = isCareers
                   ? item.path!
                   : isHomepage

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Image as ImageIcon, X, ChevronLeft, ChevronRight, Calendar, Maximize2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Image as ImageIcon, X, ChevronLeft, ChevronRight, Calendar, Maximize2, ArrowRight } from "lucide-react";
 import { GALLERY_ITEMS } from "../data/gallery";
 import type { GalleryItem } from "../types";
 import { getPublishedGalleryImages } from "../services/gallery";
@@ -159,6 +160,17 @@ export const Gallery = () => {
             })}
           </AnimatePresence>
         </motion.div>
+
+        {/* View Complete Archive CTA */}
+        <div className="mt-12 text-center">
+          <Link
+            to="/gallery"
+            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-xs font-semibold uppercase tracking-wider text-[#07111F] bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] hover:shadow-lg hover:shadow-[#D7B65A]/25 transition-all duration-300 group"
+          >
+            <span>Explore Complete Visual Archive & Albums</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
 
       </div>
 
