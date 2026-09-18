@@ -315,36 +315,57 @@ export async function adminDeleteCareer(id: string): Promise<void> {
 }
 
 export async function adminPublishCareer(id: string): Promise<Career> {
-  const result = await adminUpdateCareer(id, { status: 'published' });
+  if (!supabase) throw new Error('Supabase not configured');
+  const { data, error } = await supabase
+    .from('careers')
+    .update({ status: 'published', updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
   void logAuditEvent({
     action: 'PUBLISH',
     entityType: 'career',
     entityId: id,
-    entityName: result.title,
+    entityName: data.title,
   });
-  return result;
+  return data;
 }
 
 export async function adminUnpublishCareer(id: string): Promise<Career> {
-  const result = await adminUpdateCareer(id, { status: 'draft' });
+  if (!supabase) throw new Error('Supabase not configured');
+  const { data, error } = await supabase
+    .from('careers')
+    .update({ status: 'draft', updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
   void logAuditEvent({
     action: 'UNPUBLISH',
     entityType: 'career',
     entityId: id,
-    entityName: result.title,
+    entityName: data.title,
   });
-  return result;
+  return data;
 }
 
 export async function adminArchiveCareer(id: string): Promise<Career> {
-  const result = await adminUpdateCareer(id, { status: 'archived' });
+  if (!supabase) throw new Error('Supabase not configured');
+  const { data, error } = await supabase
+    .from('careers')
+    .update({ status: 'archived', updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw new Error(error.message);
   void logAuditEvent({
     action: 'ARCHIVE',
     entityType: 'career',
     entityId: id,
-    entityName: result.title,
+    entityName: data.title,
   });
-  return result;
+  return data;
 }
 
 export async function adminGetCareerStats(): Promise<{

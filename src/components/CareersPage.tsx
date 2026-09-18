@@ -32,6 +32,16 @@ export const CareersPage: React.FC = () => {
     document.title = 'Careers & Opportunities | Rotaract Club of Lead India Ahead';
     window.scrollTo({ top: 0, behavior: 'instant' });
 
+    // SEO meta description
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      (metaDesc as HTMLMetaElement).name = 'description';
+      document.head.appendChild(metaDesc);
+    }
+    (metaDesc as HTMLMetaElement).content =
+      'Explore verified job, internship, fellowship, and volunteer opportunities curated by the Rotaract Club of Lead India Ahead for ambitious young professionals across District 3206.';
+
     async function load() {
       try {
         const data = await getPublishedCareers();

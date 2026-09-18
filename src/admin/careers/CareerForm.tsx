@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -84,6 +84,10 @@ export const CareerForm: React.FC = () => {
     featured: false,
   });
 
+  // Unsaved changes tracking
+  const savedFormRef = useRef<typeof formData | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+
   // Tiptap for description ONLY
   const editor = useEditor({
     extensions: [
@@ -140,6 +144,33 @@ export const CareerForm: React.FC = () => {
             featured: career.featured,
           });
 
+          // Set baseline for unsaved-changes tracking
+          savedFormRef.current = {
+            title: career.title,
+            slug: career.slug,
+            organization_name: career.organization_name,
+            organization_website: career.organization_website || '',
+            organization_logo_url: career.organization_logo_url || '',
+            opportunity_type: career.opportunity_type,
+            work_mode: career.work_mode,
+            location: career.location || '',
+            experience_level: (career.experience_level || 'entry_level') as CareerExperienceLevel,
+            remuneration: career.remuneration || '',
+            application_deadline: career.application_deadline
+              ? career.application_deadline.slice(0, 10)
+              : '',
+            application_url: career.application_url,
+            application_label: career.application_label || 'Apply Now',
+            responsibilities: career.responsibilities || '',
+            requirements: career.requirements || '',
+            preferred_skills: career.preferred_skills || '',
+            benefits: career.benefits || '',
+            additional_information: career.additional_information || '',
+            contact_email: career.contact_email || '',
+            status: career.status,
+            featured: career.featured,
+          };
+
           if (editor && career.description) {
             editor.commands.setContent(career.description);
           }
@@ -154,9 +185,33 @@ export const CareerForm: React.FC = () => {
     [editor, navigate]
   );
 
+  // Mark form as dirty whenever data changes after initial load
+  useEffect(() => {
+    if (!loading && savedFormRef.current) {
+      const current = JSON.stringify(formData);
+      const saved = JSON.stringify(savedFormRef.current);
+      setIsDirty(current !== saved);
+    }
+  }, [formData, loading]);
+
+  // Warn user if they try to leave with unsaved changes
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isDirty]);
+
   useEffect(() => {
     if (isEdit && id) {
       void loadCareer(id);
+    } else {
+      // For new records, mark the initial empty state as "saved"
+      savedFormRef.current = formData;
     }
   }, [id, isEdit, loadCareer]);
 
@@ -226,14 +281,31 @@ export const CareerForm: React.FC = () => {
 
   const setEditorLink = () => {
     if (!editor) return;
-    const prevUrl = editor.getAttributes('link').href;
-    const url = window.prompt('Enter URL:', prevUrl);
-    if (url === null) return;
+    const prevUrl = editor.getAttributes('link').href as string | undefined;
+    const url = window.prompt('Enter URL (must start with https://):', prevUrl || '');
+    if (url === null) return; // cancelled
     if (url === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
       return;
     }
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    // Security: block dangerous protocols
+    const trimmed = url.trim();
+    const lower = trimmed.toLowerCase();
+    if (
+      lower.startsWith('javascript:') ||
+      lower.startsWith('data:') ||
+      lower.startsWith('vbscript:') ||
+      lower.startsWith('file:') ||
+      lower.startsWith('blob:')
+    ) {
+      showToast.error('Dangerous protocol not allowed in links.');
+      return;
+    }
+    if (!lower.startsWith('https://') && !lower.startsWith('http://')) {
+      showToast.error('Only http:// or https:// links are allowed.');
+      return;
+    }
+    editor.chain().focus().extendMarkRange('link').setLink({ href: trimmed }).run();
   };
 
   const handleSubmit = async (e: React.FormEvent, overrideStatus?: CareerStatus) => {
@@ -301,6 +373,8 @@ export const CareerForm: React.FC = () => {
         await adminCreateCareer(payload as any);
         showToast.success('Opportunity created successfully');
       }
+      // Clear dirty flag before navigating so beforeunload doesn't fire
+      setIsDirty(false);
       navigate('/admin/careers');
     } catch (err: any) {
       showToast.error(err.message || 'Failed to save opportunity');

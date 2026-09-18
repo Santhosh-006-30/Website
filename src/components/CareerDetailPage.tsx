@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft,
   Building2,
@@ -40,6 +41,17 @@ export const CareerDetailPage: React.FC = () => {
         setCareer(data);
         if (data) {
           document.title = `${data.title} at ${data.organization_name} | Rotaract Club of LIA`;
+          // Meta description for SEO
+          let metaDesc = document.querySelector('meta[name="description"]');
+          if (!metaDesc) {
+            metaDesc = document.createElement('meta');
+            (metaDesc as HTMLMetaElement).name = 'description';
+            document.head.appendChild(metaDesc);
+          }
+          (metaDesc as HTMLMetaElement).content =
+            `${data.title} at ${data.organization_name}. ${
+              data.opportunity_type.replace('_', ' ')
+            } opportunity — ${data.work_mode.replace('_', '-')} | Apply now on Rotaract Club of Lead India Ahead.`;
         } else {
           document.title = 'Opportunity Not Found | Rotaract Club of LIA';
         }
@@ -51,6 +63,33 @@ export const CareerDetailPage: React.FC = () => {
     }
     void load();
   }, [slug]);
+
+  /**
+   * Returns the URL only if it is a safe https:// link.
+   * Blocks javascript:, data:, vbscript:, file:, blob:, and bare http://
+   */
+  const safeBrowsableUrl = (url: string | null | undefined): string | null => {
+    if (!url) return null;
+    const trimmed = url.trim();
+    const lower = trimmed.toLowerCase();
+    if (
+      lower.startsWith('javascript:') ||
+      lower.startsWith('data:') ||
+      lower.startsWith('vbscript:') ||
+      lower.startsWith('file:') ||
+      lower.startsWith('blob:')
+    ) return null;
+    if (!lower.startsWith('http://') && !lower.startsWith('https://')) return null;
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return null;
+      return trimmed;
+    } catch {
+      return null;
+    }
+  };
+
+  const safeWebsiteUrl = safeBrowsableUrl(career?.organization_website);
 
   const handleShare = async () => {
     try {
@@ -170,9 +209,9 @@ export const CareerDetailPage: React.FC = () => {
                           {career.organization_name}
                         </span>
 
-                        {career.organization_website && (
+                        {career.organization_website && safeWebsiteUrl && (
                           <a
-                            href={career.organization_website}
+                            href={safeWebsiteUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-slate-400 hover:text-white transition-colors"
@@ -267,7 +306,19 @@ export const CareerDetailPage: React.FC = () => {
                     </h2>
                     <div
                       className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: career.description }}
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(career.description, {
+                          ALLOWED_TAGS: [
+                            'p','br','strong','em','u','s','h1','h2','h3','h4',
+                            'ul','ol','li','blockquote','a','hr','pre','code',
+                          ],
+                          ALLOWED_ATTR: ['href','target','rel','class'],
+                          ALLOW_DATA_ATTR: false,
+                          FORBID_TAGS: ['script','style','iframe','form','object','embed'],
+                          FORBID_ATTR: ['onerror','onload','onclick','onmouseover','style'],
+                          FORCE_BODY: false,
+                        }),
+                      }}
                     />
                   </div>
 
