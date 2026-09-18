@@ -1,6 +1,6 @@
 // ============================================================
 // Supabase Database Type Definitions
-// Generated from the schema in supabase/migrations/001_initial_schema.sql
+// Phase 24: super_admin, AuditLog, audit_logs table
 // ============================================================
 
 export interface Database {
@@ -61,12 +61,17 @@ export interface Database {
         Insert: Omit<SiteSetting, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<SiteSetting, 'id'>>;
       };
+      audit_logs: {
+        Row: AuditLog;
+        Insert: Omit<AuditLog, 'id' | 'created_at'>;
+        Update: never; // Audit logs are append-only
+      };
     };
     Functions: {
-      is_admin: {
-        Args: Record<never, never>;
-        Returns: boolean;
-      };
+      is_admin: { Args: Record<never, never>; Returns: boolean };
+      is_super_admin: { Args: Record<never, never>; Returns: boolean };
+      is_cms_user: { Args: Record<never, never>; Returns: boolean };
+      is_viewer_or_above: { Args: Record<never, never>; Returns: boolean };
     };
   };
 }
@@ -78,7 +83,7 @@ export interface Database {
 export interface Profile {
   id: string;
   email: string;
-  role: 'admin' | 'editor' | 'viewer';
+  role: UserRole;
   full_name: string | null;
   created_at: string;
   updated_at: string;
@@ -254,12 +259,63 @@ export interface SiteSetting {
 }
 
 // ============================================================
+// AUDIT LOG (Phase 24)
+// ============================================================
+
+export type AuditAction =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'PUBLISH'
+  | 'UNPUBLISH'
+  | 'ARCHIVE'
+  | 'LOGIN'
+  | 'LOGOUT'
+  | 'UPLOAD'
+  | 'DELETE_IMAGE'
+  | 'ROLE_CHANGE';
+
+export type AuditEntityType =
+  | 'event'
+  | 'post'
+  | 'project'
+  | 'gallery_album'
+  | 'gallery_image'
+  | 'team_member'
+  | 'profile'
+  | 'site_setting'
+  | 'website_content'
+  | 'session';
+
+export interface AuditLog {
+  id: string;
+  user_id: string | null;
+  user_email: string | null;
+  user_name: string | null;
+  action: AuditAction;
+  entity_type: AuditEntityType | null;
+  entity_id: string | null;
+  entity_name: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+// ============================================================
 // UTILITY TYPES
 // ============================================================
 
 export type ContentStatus = 'draft' | 'published' | 'archived';
 
-export type UserRole = 'admin' | 'editor' | 'viewer';
+// Phase 24: super_admin is the highest privilege tier
+export type UserRole = 'super_admin' | 'admin' | 'editor' | 'viewer';
+
+// Numeric levels for hierarchy checks (higher = more permissions)
+export const ROLE_LEVEL: Record<UserRole, number> = {
+  super_admin: 4,
+  admin: 3,
+  editor: 2,
+  viewer: 1,
+};
 
 export interface PaginationOptions {
   page: number;

@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Calendar, FileText, FolderKanban, Image, Users, Plus,
-  TrendingUp, Clock, ArrowRight,
+  TrendingUp, Clock, ArrowRight, Activity, ShieldCheck,
+  Archive, Sparkles
 } from 'lucide-react';
 import { adminGetEventStats } from '../services/events';
 import { adminGetPostStats } from '../services/posts';
 import { adminGetGalleryStats } from '../services/gallery';
 import { adminGetProjectStats } from '../services/projects';
 import { adminGetTeamStats } from '../services/team';
+import { getRecentActivity } from '../services/audit';
+import type { AuditLog } from '../types/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from './shared/LoadingSpinner';
 
 interface DashboardStats {
@@ -84,20 +88,24 @@ function QuickAction({ to, icon, label }: QuickActionProps) {
 }
 
 export function AdminDashboard() {
+  const { role, isSuperAdmin, isAdmin } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentLogs, setRecentLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadStats() {
       try {
-        const [events, posts, gallery, projects, team] = await Promise.all([
+        const [events, posts, gallery, projects, team, logs] = await Promise.all([
           adminGetEventStats(),
           adminGetPostStats(),
           adminGetGalleryStats(),
           adminGetProjectStats(),
           adminGetTeamStats(),
+          getRecentActivity(6),
         ]);
         setStats({ events, posts, gallery, projects, team });
+        setRecentLogs(logs);
       } catch (err) {
         console.error('Dashboard stats error:', err);
       } finally {
@@ -117,12 +125,34 @@ export function AdminDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      {/* Welcome */}
-      <div>
-        <h1 className="text-2xl font-bold text-slate-100 mb-1">Dashboard</h1>
-        <p className="text-slate-400 text-sm">
-          Rotaract Club of Lead India Ahead — MAAYON 2026–27 CMS
-        </p>
+      {/* Welcome & Role Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-100 mb-1 flex items-center gap-2.5">
+            Dashboard V2
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-mono">
+              CMS V2
+            </span>
+          </h1>
+          <p className="text-slate-400 text-sm">
+            Rotaract Club of Lead India Ahead — Professional Content Governance &amp; Administration
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${
+            role === 'super_admin'
+              ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+              : role === 'admin'
+              ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+              : role === 'editor'
+              ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+              : 'bg-slate-500/15 text-slate-300 border-slate-500/30'
+          }`}>
+            <ShieldCheck className="w-3.5 h-3.5" />
+            {role?.replace('_', ' ').toUpperCase()}
+          </span>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -130,14 +160,14 @@ export function AdminDashboard() {
         <StatCard
           label="Total Events"
           value={stats?.events.total ?? 0}
-          sub={`${stats?.events.published ?? 0} published`}
+          sub={`${stats?.events.published ?? 0} live • ${stats?.events.archived ?? 0} archived`}
           icon={<Calendar className="w-5 h-5" />}
           to="/admin/events"
         />
         <StatCard
           label="Published Events"
           value={stats?.events.published ?? 0}
-          sub={`${stats?.events.draft ?? 0} drafts`}
+          sub="Live on public website"
           icon={<TrendingUp className="w-5 h-5" />}
           to="/admin/events"
           accentColor="#34d399"
@@ -145,13 +175,13 @@ export function AdminDashboard() {
         <StatCard
           label="Draft Events"
           value={stats?.events.draft ?? 0}
-          sub="Pending review"
+          sub="In preparation"
           icon={<Clock className="w-5 h-5" />}
           to="/admin/events"
           accentColor="#fbbf24"
         />
         <StatCard
-          label="Posts"
+          label="Articles / Posts"
           value={stats?.posts.total ?? 0}
           sub={`${stats?.posts.published ?? 0} published`}
           icon={<FileText className="w-5 h-5" />}
@@ -161,47 +191,135 @@ export function AdminDashboard() {
         <StatCard
           label="Gallery Images"
           value={stats?.gallery.total ?? 0}
-          sub={`${stats?.gallery.albums ?? 0} albums`}
+          sub={`${stats?.gallery.albums ?? 0} photo albums`}
           icon={<Image className="w-5 h-5" />}
           to="/admin/gallery"
           accentColor="#a78bfa"
         />
         <StatCard
-          label="Projects"
+          label="Initiatives & Projects"
           value={stats?.projects.total ?? 0}
-          sub={`${stats?.projects.published ?? 0} published`}
+          sub={`${stats?.projects.featured ?? 0} flagship`}
           icon={<FolderKanban className="w-5 h-5" />}
           to="/admin/projects"
           accentColor="#f472b6"
         />
         <StatCard
-          label="Team Members"
+          label="Team Directory"
           value={stats?.team.total ?? 0}
           sub={`${stats?.team.published ?? 0} published`}
           icon={<Users className="w-5 h-5" />}
           to="/admin/team"
           accentColor="#2dd4bf"
         />
+        <StatCard
+          label="Archived Events"
+          value={stats?.events.archived ?? 0}
+          sub="Preserved records"
+          icon={<Archive className="w-5 h-5" />}
+          to="/admin/events"
+          accentColor="#94a3b8"
+        />
       </div>
 
-      {/* Quick Actions */}
-      <div
-        className="rounded-2xl p-6"
-        style={{
-          background: 'rgba(14, 27, 48, 0.8)',
-          border: '1px solid rgba(255,255,255,0.07)',
-        }}
-      >
-        <h2 className="text-base font-semibold text-slate-200 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <QuickAction to="/admin/events/new" icon={<Plus className="w-4 h-4" />} label="New Event" />
-          <QuickAction to="/admin/posts/new" icon={<Plus className="w-4 h-4" />} label="New Post" />
-          <QuickAction to="/admin/gallery" icon={<Image className="w-4 h-4" />} label="Upload Gallery" />
-          <QuickAction to="/admin/settings" icon={<Users className="w-4 h-4" />} label="Edit Settings" />
+      {/* Grid: Quick Actions + Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Quick Actions (1 Col) */}
+        <div
+          className="rounded-2xl p-6 flex flex-col justify-between"
+          style={{
+            background: 'rgba(14, 27, 48, 0.8)',
+            border: '1px solid rgba(255,255,255,0.07)',
+          }}
+        >
+          <div>
+            <h2 className="text-base font-semibold text-slate-200 mb-4 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#D7B65A]" />
+              Quick Actions
+            </h2>
+            <div className="space-y-2.5">
+              <QuickAction to="/admin/events/new" icon={<Plus className="w-4 h-4" />} label="Create Event" />
+              <QuickAction to="/admin/posts/new" icon={<Plus className="w-4 h-4" />} label="Write New Post" />
+              <QuickAction to="/admin/gallery" icon={<Image className="w-4 h-4" />} label="Upload Gallery Photos" />
+              {isAdmin && (
+                <QuickAction to="/admin/activity" icon={<Activity className="w-4 h-4" />} label="View Activity Log" />
+              )}
+              {isSuperAdmin && (
+                <QuickAction to="/admin/users" icon={<Users className="w-4 h-4" />} label="Manage Roles & Access" />
+              )}
+            </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-slate-800/80 text-xs text-slate-400">
+            Current Session: <span className="text-slate-200 font-medium">{role}</span>
+          </div>
+        </div>
+
+        {/* Recent Activity Feed (2 Cols) */}
+        <div
+          className="lg:col-span-2 rounded-2xl p-6"
+          style={{
+            background: 'rgba(14, 27, 48, 0.8)',
+            border: '1px solid rgba(255,255,255,0.07)',
+          }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-cyan-400" />
+              Recent Administrative Activity
+            </h2>
+            {isAdmin && (
+              <Link
+                to="/admin/activity"
+                className="text-xs text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors"
+              >
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+
+          {recentLogs.length === 0 ? (
+            <div className="text-center py-10 text-slate-500 text-sm">
+              No recent activity recorded yet.
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-800/60">
+              {recentLogs.map((log) => (
+                <div key={log.id} className="py-3 flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
+                      log.action === 'CREATE' || log.action === 'PUBLISH'
+                        ? 'bg-emerald-500/15 text-emerald-300'
+                        : log.action === 'UPDATE' || log.action === 'UPLOAD'
+                        ? 'bg-blue-500/15 text-blue-300'
+                        : log.action === 'DELETE' || log.action === 'DELETE_IMAGE'
+                        ? 'bg-rose-500/15 text-rose-300'
+                        : log.action === 'ROLE_CHANGE'
+                        ? 'bg-purple-500/15 text-purple-300'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}>
+                      {log.action}
+                    </span>
+                    <div className="truncate">
+                      <span className="text-slate-200 font-medium truncate block">
+                        {log.entity_name || log.entity_type || 'System Event'}
+                      </span>
+                      <span className="text-slate-500 text-[11px]">
+                        by {log.user_name || log.user_email || 'System'}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-slate-500 shrink-0 font-mono text-[11px]">
+                    {new Date(log.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Info Panel */}
+      {/* Governance & Publication Notice */}
       <div
         className="rounded-2xl p-6"
         style={{
@@ -209,12 +327,15 @@ export function AdminDashboard() {
           border: '1px solid rgba(215,182,90,0.15)',
         }}
       >
-        <h2 className="text-base font-semibold text-[#D7B65A] mb-2">Getting Started</h2>
+        <h2 className="text-base font-semibold text-[#D7B65A] mb-2 flex items-center gap-2">
+          <ShieldCheck className="w-4 h-4 text-[#D7B65A]" />
+          CMS V2 Governance &amp; Publishing Rules
+        </h2>
         <ul className="text-sm text-slate-400 space-y-2">
-          <li>• Go to <Link to="/admin/events" className="text-[#D7B65A] hover:underline">Events</Link> to manage all club events and upload event photographs.</li>
-          <li>• Use <Link to="/admin/gallery" className="text-[#D7B65A] hover:underline">Gallery</Link> to create albums (event-linked or standalone) and upload images.</li>
-          <li>• Use <Link to="/admin/settings" className="text-[#D7B65A] hover:underline">Settings</Link> to update club info, social links, and contact details.</li>
-          <li>• Published content appears on the public website immediately — no deployment needed.</li>
+          <li>• <strong className="text-slate-200">Role-Based Access:</strong> Only Super Admins can alter user roles. Editors can draft and publish content but cannot delete records.</li>
+          <li>• <strong className="text-slate-200">Draft Preview:</strong> You can preview unpublished drafts with complete public styling before making them visible.</li>
+          <li>• <strong className="text-slate-200">Audit Logging:</strong> All administrative modifications are permanently tracked in the audit trail.</li>
+          <li>• <strong className="text-slate-200">Live Website Sync:</strong> Changes to published items update on the public website immediately.</li>
         </ul>
       </div>
     </div>

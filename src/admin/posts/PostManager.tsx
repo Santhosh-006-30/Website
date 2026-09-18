@@ -13,6 +13,7 @@ import {
   adminUpdatePost 
 } from '../../services/posts';
 import type { Post, ContentStatus } from '../../types/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { StatusBadge } from '../shared/StatusBadge';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { TableSkeleton } from '../shared/LoadingSpinner';
@@ -21,6 +22,7 @@ import { showToast } from '../shared/Toast';
 
 export const PostManager: React.FC = () => {
   const navigate = useNavigate();
+  const { canDelete, canWrite } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -33,6 +35,10 @@ export const PostManager: React.FC = () => {
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [pendingStatusPost, setPendingStatusPost] = useState<{
+    post: Post;
+    targetStatus: 'published' | 'draft' | 'archived';
+  } | null>(null);
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
@@ -60,6 +66,10 @@ export const PostManager: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1);
+    fetchEventsOrPosts();
+  };
+
+  const fetchEventsOrPosts = () => {
     fetchPosts();
   };
 
@@ -78,29 +88,35 @@ export const PostManager: React.FC = () => {
     }
   };
 
-  const handleToggleStatus = async (post: Post) => {
+  const executeStatusChange = async () => {
+    if (!pendingStatusPost) return;
+    const { post, targetStatus } = pendingStatusPost;
     try {
-      if (post.status === 'published') {
-        await adminUnpublishPost(post.id);
-        showToast.success(`"${post.title}" unpublished`);
-      } else {
+      if (targetStatus === 'published') {
         await adminPublishPost(post.id);
         showToast.success(`"${post.title}" published`);
+      } else if (targetStatus === 'archived') {
+        await adminArchivePost(post.id);
+        showToast.success(`"${post.title}" archived`);
+      } else {
+        await adminUnpublishPost(post.id);
+        showToast.success(`"${post.title}" unpublished`);
       }
       fetchPosts();
     } catch (err: any) {
       showToast.error(err.message || 'Failed to update status');
+    } finally {
+      setPendingStatusPost(null);
     }
   };
 
-  const handleArchive = async (post: Post) => {
-    try {
-      await adminArchivePost(post.id);
-      showToast.success(`"${post.title}" archived`);
-      fetchPosts();
-    } catch (err: any) {
-      showToast.error(err.message || 'Failed to archive post');
-    }
+  const handleToggleStatus = (post: Post) => {
+    const nextStatus = post.status === 'published' ? 'draft' : 'published';
+    setPendingStatusPost({ post, targetStatus: nextStatus });
+  };
+
+  const handleArchive = (post: Post) => {
+    setPendingStatusPost({ post, targetStatus: 'archived' });
   };
 
   const handleToggleFeatured = async (post: Post) => {
@@ -272,19 +288,32 @@ export const PostManager: React.FC = () => {
 
                     <td className="py-4 px-4 text-right">
                       <div className="inline-flex items-center gap-1">
-                        <button
-                          onClick={() => handleToggleStatus(post)}
-                          title={post.status === 'published' ? 'Unpublish' : 'Publish'}
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                        {/* Preview Button */}
+                        <Link
+                          to={`/admin/preview/post/${post.id}`}
+                          title="Preview Post"
+                          className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                         >
-                          {post.status === 'published' ? (
-                            <EyeOff className="w-4 h-4 text-amber-400" />
-                          ) : (
-                            <Eye className="w-4 h-4 text-emerald-400" />
-                          )}
-                        </button>
+                          <Eye className="w-4 h-4 text-cyan-400" />
+                        </Link>
 
-                        {post.status !== 'archived' && (
+                        {/* Status Toggle Button */}
+                        {canWrite && (
+                          <button
+                            onClick={() => handleToggleStatus(post)}
+                            title={post.status === 'published' ? 'Unpublish' : 'Publish'}
+                            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                          >
+                            {post.status === 'published' ? (
+                              <EyeOff className="w-4 h-4 text-amber-400" />
+                            ) : (
+                              <Eye className="w-4 h-4 text-emerald-400" />
+                            )}
+                          </button>
+                        )}
+
+                        {/* Archive Button */}
+                        {canWrite && post.status !== 'archived' && (
                           <button
                             onClick={() => handleArchive(post)}
                             title="Archive"
@@ -294,6 +323,7 @@ export const PostManager: React.FC = () => {
                           </button>
                         )}
 
+                        {/* Edit Button */}
                         <Link
                           to={`/admin/posts/${post.id}/edit`}
                           title="Edit"
@@ -302,13 +332,16 @@ export const PostManager: React.FC = () => {
                           <Edit2 className="w-4 h-4" />
                         </Link>
 
-                        <button
-                          onClick={() => setDeleteId(post.id)}
-                          title="Delete"
-                          className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {/* Delete Button (admin/super_admin only) */}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleteId(post.id)}
+                            title="Delete"
+                            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -350,6 +383,35 @@ export const PostManager: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Status Change Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingStatusPost)}
+        title={
+          pendingStatusPost?.targetStatus === 'published'
+            ? 'Publish Post to Live Website'
+            : pendingStatusPost?.targetStatus === 'archived'
+            ? 'Archive Post'
+            : 'Unpublish Post (Move to Draft)'
+        }
+        message={
+          pendingStatusPost?.targetStatus === 'published'
+            ? `Are you sure you want to publish "${pendingStatusPost?.post.title}"? It will be immediately visible on the public website.`
+            : pendingStatusPost?.targetStatus === 'archived'
+            ? `Are you sure you want to archive "${pendingStatusPost?.post.title}"?`
+            : `Are you sure you want to unpublish "${pendingStatusPost?.post.title}"?`
+        }
+        confirmLabel={
+          pendingStatusPost?.targetStatus === 'published'
+            ? 'Publish Now'
+            : pendingStatusPost?.targetStatus === 'archived'
+            ? 'Archive Post'
+            : 'Unpublish Post'
+        }
+        confirmVariant={pendingStatusPost?.targetStatus === 'published' ? 'primary' : 'warning'}
+        onConfirm={executeStatusChange}
+        onCancel={() => setPendingStatusPost(null)}
+      />
 
       <ConfirmDialog
         isOpen={!!deleteId}

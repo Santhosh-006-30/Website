@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, FileText, FolderKanban, Image,
   Users, Globe, Settings, LogOut, ChevronLeft, ChevronRight,
-  Shield, Menu, X,
+  Shield, Menu, X, Activity, UserCog, User
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -14,24 +14,46 @@ interface NavItem {
   end?: boolean;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { to: '/admin', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', end: true },
-  { to: '/admin/events', icon: <Calendar className="w-5 h-5" />, label: 'Events' },
-  { to: '/admin/posts', icon: <FileText className="w-5 h-5" />, label: 'Posts' },
-  { to: '/admin/projects', icon: <FolderKanban className="w-5 h-5" />, label: 'Projects' },
-  { to: '/admin/gallery', icon: <Image className="w-5 h-5" />, label: 'Gallery' },
-  { to: '/admin/team', icon: <Users className="w-5 h-5" />, label: 'Leadership' },
-  { to: '/admin/content', icon: <Globe className="w-5 h-5" />, label: 'Website Content' },
-  { to: '/admin/settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
-];
-
 interface SidebarContentProps {
   collapsed: boolean;
   onLogout: () => void;
 }
 
 function SidebarContent({ collapsed, onLogout }: SidebarContentProps) {
-  const { profile } = useAuth();
+  const { profile, isAdmin, isSuperAdmin, role } = useAuth();
+
+  const navItems: NavItem[] = [
+    { to: '/admin', icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', end: true },
+    { to: '/admin/events', icon: <Calendar className="w-5 h-5" />, label: 'Events' },
+    { to: '/admin/posts', icon: <FileText className="w-5 h-5" />, label: 'Posts' },
+    { to: '/admin/projects', icon: <FolderKanban className="w-5 h-5" />, label: 'Projects' },
+    { to: '/admin/gallery', icon: <Image className="w-5 h-5" />, label: 'Gallery' },
+    { to: '/admin/team', icon: <Users className="w-5 h-5" />, label: 'Leadership' },
+    { to: '/admin/content', icon: <Globe className="w-5 h-5" />, label: 'Website Content' },
+    { to: '/admin/settings', icon: <Settings className="w-5 h-5" />, label: 'Settings' },
+  ];
+
+  if (isAdmin) {
+    navItems.push({
+      to: '/admin/activity',
+      icon: <Activity className="w-5 h-5" />,
+      label: 'Activity Log',
+    });
+  }
+
+  if (isSuperAdmin) {
+    navItems.push({
+      to: '/admin/users',
+      icon: <UserCog className="w-5 h-5" />,
+      label: 'User Governance',
+    });
+  }
+
+  navItems.push({
+    to: '/admin/profile',
+    icon: <User className="w-5 h-5" />,
+    label: 'Profile',
+  });
 
   return (
     <div className="flex flex-col h-full">
@@ -58,7 +80,7 @@ function SidebarContent({ collapsed, onLogout }: SidebarContentProps) {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {NAV_ITEMS.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -80,13 +102,31 @@ function SidebarContent({ collapsed, onLogout }: SidebarContentProps) {
         ))}
       </nav>
 
-      {/* User + Logout */}
+      {/* User + Role + Logout */}
       <div className="border-t border-white/8 p-3 flex-shrink-0 space-y-1">
         {!collapsed && profile && (
-          <div className="px-3 py-2 mb-1">
-            <p className="text-xs text-slate-500 truncate">Signed in as</p>
-            <p className="text-xs text-slate-300 truncate font-medium">{profile.email}</p>
-          </div>
+          <NavLink
+            to="/admin/profile"
+            className="block px-3 py-2 mb-1 rounded-xl hover:bg-white/6 transition-colors"
+          >
+            <div className="flex items-center justify-between gap-1 mb-0.5">
+              <span className="text-xs text-slate-400 truncate font-medium">
+                {profile.full_name || 'Admin'}
+              </span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-semibold uppercase ${
+                role === 'super_admin'
+                  ? 'bg-amber-500/20 text-amber-300'
+                  : role === 'admin'
+                  ? 'bg-blue-500/20 text-blue-300'
+                  : role === 'editor'
+                  ? 'bg-emerald-500/20 text-emerald-300'
+                  : 'bg-slate-700 text-slate-300'
+              }`}>
+                {role === 'super_admin' ? 'SUPER' : role}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 truncate font-mono">{profile.email}</p>
+          </NavLink>
         )}
         <button
           onClick={onLogout}

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { Post, PaginatedResult, PaginationOptions, ContentStatus } from '../types/supabase';
+import { logAuditEvent } from './audit';
 
 export async function getPublishedPosts(): Promise<Post[]> {
   if (!supabase) return [];
@@ -62,6 +63,13 @@ export async function adminCreatePost(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'CREATE',
+    entityType: 'post',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { slug: data.slug, category: data.category },
+  });
   return data;
 }
 
@@ -77,6 +85,13 @@ export async function adminUpdatePost(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPDATE',
+    entityType: 'post',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { fields: Object.keys(updates) },
+  });
   return data;
 }
 
@@ -84,19 +99,47 @@ export async function adminDeletePost(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('posts').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE',
+    entityType: 'post',
+    entityId: id,
+  });
 }
 
 export async function adminPublishPost(id: string): Promise<Post> {
-  return adminUpdatePost(id, {
+  const result = await adminUpdatePost(id, {
     status: 'published',
     publish_date: new Date().toISOString().split('T')[0],
   });
+  void logAuditEvent({
+    action: 'PUBLISH',
+    entityType: 'post',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
+
 export async function adminUnpublishPost(id: string): Promise<Post> {
-  return adminUpdatePost(id, { status: 'draft' });
+  const result = await adminUpdatePost(id, { status: 'draft' });
+  void logAuditEvent({
+    action: 'UNPUBLISH',
+    entityType: 'post',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
+
 export async function adminArchivePost(id: string): Promise<Post> {
-  return adminUpdatePost(id, { status: 'archived' });
+  const result = await adminUpdatePost(id, { status: 'archived' });
+  void logAuditEvent({
+    action: 'ARCHIVE',
+    entityType: 'post',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
 
 export async function adminGetPostStats(): Promise<{

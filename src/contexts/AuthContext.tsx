@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import type { Profile } from '../types/supabase';
+import type { Profile, UserRole } from '../types/supabase';
+import { logAuditEvent } from '../services/audit';
 
 // ============================================================
 // CONTEXT TYPES
@@ -11,7 +12,15 @@ interface AuthContextValue {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
-  isAdmin: boolean;
+  // Role helpers
+  role: UserRole | null;
+  isSuperAdmin: boolean;
+  isAdmin: boolean;   // true for admin OR super_admin
+  isEditor: boolean;
+  isViewer: boolean;
+  canWrite: boolean;  // true for super_admin, admin, editor
+  canDelete: boolean; // true for super_admin, admin only
+  // Actions
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   error: string | null;
@@ -53,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Get initial session
+    // Restore existing session
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -63,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    // Subscribe to auth changes
+    // Subscribe to auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -92,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (authError) {
       setLoading(false);
-      // Never reveal whether an email exists — use generic message
+      // Never reveal whether the email exists
       throw new Error('Invalid email or password. Please try again.');
     }
 
@@ -103,31 +112,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const prof = await fetchProfile(data.user.id);
 
-    if (!prof || prof.role !== 'admin') {
-      // Authenticated but not an admin — sign out and reject
+    // All four roles (super_admin, admin, editor, viewer) may access the CMS.
+    // There is no role-based login rejection — authorization happens per-route/per-action.
+    if (!prof) {
       await supabase.auth.signOut();
       setUser(null);
       setProfile(null);
       setLoading(false);
-      throw new Error('You do not have administrator access to this system.');
+      throw new Error('Your account profile could not be loaded. Contact the administrator.');
     }
 
     setUser(data.user);
     setProfile(prof);
     setLoading(false);
+
+    // Log LOGIN audit event (best-effort, after state is set)
+    void logAuditEvent({
+      action: 'LOGIN',
+      entityType: 'session',
+      entityName: prof.email,
+      metadata: { role: prof.role },
+    });
   }, [fetchProfile]);
 
   const logout = useCallback(async () => {
     if (!supabase) return;
+
+    // Log LOGOUT before session is destroyed
+    void logAuditEvent({
+      action: 'LOGOUT',
+      entityType: 'session',
+      entityName: profile?.email ?? undefined,
+    });
+
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
-  }, []);
+  }, [profile]);
 
-  const isAdmin = profile?.role === 'admin';
+  // ── Computed role booleans ──────────────────────────────────
+  const role = (profile?.role as UserRole) ?? null;
+  const isSuperAdmin = role === 'super_admin';
+  const isAdmin = role === 'super_admin' || role === 'admin';
+  const isEditor = role === 'editor';
+  const isViewer = role === 'viewer';
+  const canWrite = role === 'super_admin' || role === 'admin' || role === 'editor';
+  const canDelete = role === 'super_admin' || role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, isAdmin, login, logout, error }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        role,
+        isSuperAdmin,
+        isAdmin,
+        isEditor,
+        isViewer,
+        canWrite,
+        canDelete,
+        login,
+        logout,
+        error,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

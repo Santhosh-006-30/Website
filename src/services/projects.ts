@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { Project, ProjectImage, PaginatedResult, PaginationOptions } from '../types/supabase';
+import { logAuditEvent } from './audit';
 
 export async function getPublishedProjects(): Promise<Project[]> {
   if (!supabase) return [];
@@ -74,6 +75,13 @@ export async function adminCreateProject(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'CREATE',
+    entityType: 'project',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { slug: data.slug, category: data.category },
+  });
   return data;
 }
 
@@ -89,6 +97,13 @@ export async function adminUpdateProject(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPDATE',
+    entityType: 'project',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { fields: Object.keys(updates) },
+  });
   return data;
 }
 
@@ -96,13 +111,44 @@ export async function adminDeleteProject(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('projects').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE',
+    entityType: 'project',
+    entityId: id,
+  });
 }
 
 export async function adminPublishProject(id: string): Promise<Project> {
-  return adminUpdateProject(id, { status: 'published' });
+  const result = await adminUpdateProject(id, { status: 'published' });
+  void logAuditEvent({
+    action: 'PUBLISH',
+    entityType: 'project',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
+
+export async function adminUnpublishProject(id: string): Promise<Project> {
+  const result = await adminUpdateProject(id, { status: 'draft' });
+  void logAuditEvent({
+    action: 'UNPUBLISH',
+    entityType: 'project',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
+}
+
 export async function adminArchiveProject(id: string): Promise<Project> {
-  return adminUpdateProject(id, { status: 'archived' });
+  const result = await adminUpdateProject(id, { status: 'archived' });
+  void logAuditEvent({
+    action: 'ARCHIVE',
+    entityType: 'project',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
 
 export async function adminGetProjectImages(projectId: string): Promise<ProjectImage[]> {
@@ -126,6 +172,12 @@ export async function adminAddProjectImage(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPLOAD',
+    entityType: 'project',
+    entityId: data.project_id,
+    metadata: { image_id: data.id, image_url: data.image_url },
+  });
   return data;
 }
 
@@ -133,6 +185,11 @@ export async function adminDeleteProjectImage(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('project_images').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE_IMAGE',
+    entityType: 'project',
+    metadata: { image_id: id },
+  });
 }
 
 export async function adminGetProjectStats(): Promise<{

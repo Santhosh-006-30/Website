@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { Event, EventImage, PaginatedResult, PaginationOptions, ContentStatus } from '../types/supabase';
+import { logAuditEvent } from './audit';
 
 // ============================================================
 // PUBLIC SERVICE — used by public website components
@@ -104,6 +105,13 @@ export async function adminCreateEvent(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'CREATE',
+    entityType: 'event',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { slug: data.slug, category: data.category },
+  });
   return data;
 }
 
@@ -119,6 +127,13 @@ export async function adminUpdateEvent(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPDATE',
+    entityType: 'event',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { fields: Object.keys(updates) },
+  });
   return data;
 }
 
@@ -126,18 +141,44 @@ export async function adminDeleteEvent(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('events').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE',
+    entityType: 'event',
+    entityId: id,
+  });
 }
 
 export async function adminPublishEvent(id: string): Promise<Event> {
-  return adminUpdateEvent(id, { status: 'published' });
+  const result = await adminUpdateEvent(id, { status: 'published' });
+  void logAuditEvent({
+    action: 'PUBLISH',
+    entityType: 'event',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
 
 export async function adminUnpublishEvent(id: string): Promise<Event> {
-  return adminUpdateEvent(id, { status: 'draft' });
+  const result = await adminUpdateEvent(id, { status: 'draft' });
+  void logAuditEvent({
+    action: 'UNPUBLISH',
+    entityType: 'event',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
 
 export async function adminArchiveEvent(id: string): Promise<Event> {
-  return adminUpdateEvent(id, { status: 'archived' });
+  const result = await adminUpdateEvent(id, { status: 'archived' });
+  void logAuditEvent({
+    action: 'ARCHIVE',
+    entityType: 'event',
+    entityId: id,
+    entityName: result.title,
+  });
+  return result;
 }
 
 // EVENT IMAGES
@@ -162,6 +203,12 @@ export async function adminAddEventImage(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPLOAD',
+    entityType: 'event',
+    entityId: data.event_id,
+    metadata: { image_id: data.id, image_url: data.image_url },
+  });
   return data;
 }
 
@@ -184,6 +231,11 @@ export async function adminDeleteEventImage(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('event_images').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE_IMAGE',
+    entityType: 'event',
+    metadata: { image_id: id },
+  });
 }
 
 export async function adminSetCoverImage(eventId: string, imageId: string): Promise<void> {

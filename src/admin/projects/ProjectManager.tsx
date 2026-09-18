@@ -8,10 +8,12 @@ import {
   adminGetProjects, 
   adminDeleteProject, 
   adminPublishProject, 
+  adminUnpublishProject,
   adminArchiveProject,
   adminUpdateProject 
 } from '../../services/projects';
 import type { Project, ContentStatus } from '../../types/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { StatusBadge } from '../shared/StatusBadge';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { TableSkeleton } from '../shared/LoadingSpinner';
@@ -20,6 +22,7 @@ import { showToast } from '../shared/Toast';
 
 export const ProjectManager: React.FC = () => {
   const navigate = useNavigate();
+  const { canDelete, canWrite } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -32,6 +35,10 @@ export const ProjectManager: React.FC = () => {
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [pendingStatusProject, setPendingStatusProject] = useState<{
+    project: Project;
+    targetStatus: 'published' | 'draft' | 'archived';
+  } | null>(null);
 
   const fetchProjects = useCallback(async () => {
     setLoading(true);
@@ -77,29 +84,35 @@ export const ProjectManager: React.FC = () => {
     }
   };
 
-  const handleToggleStatus = async (project: Project) => {
+  const executeStatusChange = async () => {
+    if (!pendingStatusProject) return;
+    const { project, targetStatus } = pendingStatusProject;
     try {
-      if (project.status === 'published') {
-        await adminUpdateProject(project.id, { status: 'draft' });
-        showToast.success(`"${project.title}" set to draft`);
-      } else {
+      if (targetStatus === 'published') {
         await adminPublishProject(project.id);
         showToast.success(`"${project.title}" published`);
+      } else if (targetStatus === 'archived') {
+        await adminArchiveProject(project.id);
+        showToast.success(`"${project.title}" archived`);
+      } else {
+        await adminUnpublishProject(project.id);
+        showToast.success(`"${project.title}" unpublished`);
       }
       fetchProjects();
     } catch (err: any) {
       showToast.error(err.message || 'Failed to update status');
+    } finally {
+      setPendingStatusProject(null);
     }
   };
 
-  const handleArchive = async (project: Project) => {
-    try {
-      await adminArchiveProject(project.id);
-      showToast.success(`"${project.title}" archived`);
-      fetchProjects();
-    } catch (err: any) {
-      showToast.error(err.message || 'Failed to archive project');
-    }
+  const handleToggleStatus = (project: Project) => {
+    const nextStatus = project.status === 'published' ? 'draft' : 'published';
+    setPendingStatusProject({ project, targetStatus: nextStatus });
+  };
+
+  const handleArchive = (project: Project) => {
+    setPendingStatusProject({ project, targetStatus: 'archived' });
   };
 
   const handleToggleFeatured = async (project: Project) => {
@@ -284,19 +297,32 @@ export const ProjectManager: React.FC = () => {
 
                     <td className="py-4 px-4 text-right">
                       <div className="inline-flex items-center gap-1">
-                        <button
-                          onClick={() => handleToggleStatus(project)}
-                          title={project.status === 'published' ? 'Unpublish' : 'Publish'}
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                        {/* Preview Button */}
+                        <Link
+                          to={`/admin/preview/project/${project.id}`}
+                          title="Preview Project"
+                          className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                         >
-                          {project.status === 'published' ? (
-                            <EyeOff className="w-4 h-4 text-amber-400" />
-                          ) : (
-                            <Eye className="w-4 h-4 text-emerald-400" />
-                          )}
-                        </button>
+                          <Eye className="w-4 h-4 text-cyan-400" />
+                        </Link>
 
-                        {project.status !== 'archived' && (
+                        {/* Status Toggle Button */}
+                        {canWrite && (
+                          <button
+                            onClick={() => handleToggleStatus(project)}
+                            title={project.status === 'published' ? 'Unpublish' : 'Publish'}
+                            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                          >
+                            {project.status === 'published' ? (
+                              <EyeOff className="w-4 h-4 text-amber-400" />
+                            ) : (
+                              <Eye className="w-4 h-4 text-emerald-400" />
+                            )}
+                          </button>
+                        )}
+
+                        {/* Archive Button */}
+                        {canWrite && project.status !== 'archived' && (
                           <button
                             onClick={() => handleArchive(project)}
                             title="Archive"
@@ -306,6 +332,7 @@ export const ProjectManager: React.FC = () => {
                           </button>
                         )}
 
+                        {/* Edit Button */}
                         <Link
                           to={`/admin/projects/${project.id}/edit`}
                           title="Edit"
@@ -314,13 +341,16 @@ export const ProjectManager: React.FC = () => {
                           <Edit2 className="w-4 h-4" />
                         </Link>
 
-                        <button
-                          onClick={() => setDeleteId(project.id)}
-                          title="Delete"
-                          className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {/* Delete Button (admin/super_admin only) */}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleteId(project.id)}
+                            title="Delete"
+                            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -362,6 +392,35 @@ export const ProjectManager: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Status Change Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingStatusProject)}
+        title={
+          pendingStatusProject?.targetStatus === 'published'
+            ? 'Publish Project to Live Website'
+            : pendingStatusProject?.targetStatus === 'archived'
+            ? 'Archive Project'
+            : 'Unpublish Project (Move to Draft)'
+        }
+        message={
+          pendingStatusProject?.targetStatus === 'published'
+            ? `Are you sure you want to publish "${pendingStatusProject?.project.title}"? It will be immediately visible on the public website.`
+            : pendingStatusProject?.targetStatus === 'archived'
+            ? `Are you sure you want to archive "${pendingStatusProject?.project.title}"?`
+            : `Are you sure you want to unpublish "${pendingStatusProject?.project.title}"?`
+        }
+        confirmLabel={
+          pendingStatusProject?.targetStatus === 'published'
+            ? 'Publish Now'
+            : pendingStatusProject?.targetStatus === 'archived'
+            ? 'Archive Project'
+            : 'Unpublish Project'
+        }
+        confirmVariant={pendingStatusProject?.targetStatus === 'published' ? 'primary' : 'warning'}
+        onConfirm={executeStatusChange}
+        onCancel={() => setPendingStatusProject(null)}
+      />
 
       <ConfirmDialog
         isOpen={!!deleteId}

@@ -13,6 +13,7 @@ import {
   adminUpdateEvent 
 } from '../../services/events';
 import type { Event, ContentStatus } from '../../types/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { StatusBadge } from '../shared/StatusBadge';
 import { ConfirmDialog } from '../shared/ConfirmDialog';
 import { TableSkeleton } from '../shared/LoadingSpinner';
@@ -21,6 +22,7 @@ import { showToast } from '../shared/Toast';
 
 export const EventManager: React.FC = () => {
   const navigate = useNavigate();
+  const { canDelete, canWrite } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
@@ -35,6 +37,10 @@ export const EventManager: React.FC = () => {
   // Modal / Confirm state
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [pendingStatusEvent, setPendingStatusEvent] = useState<{
+    event: Event;
+    targetStatus: 'published' | 'draft' | 'archived';
+  } | null>(null);
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -80,29 +86,35 @@ export const EventManager: React.FC = () => {
     }
   };
 
-  const handleToggleStatus = async (event: Event) => {
+  const executeStatusChange = async () => {
+    if (!pendingStatusEvent) return;
+    const { event, targetStatus } = pendingStatusEvent;
     try {
-      if (event.status === 'published') {
-        await adminUnpublishEvent(event.id);
-        showToast.success(`"${event.title}" unpublished`);
-      } else {
+      if (targetStatus === 'published') {
         await adminPublishEvent(event.id);
         showToast.success(`"${event.title}" published`);
+      } else if (targetStatus === 'archived') {
+        await adminArchiveEvent(event.id);
+        showToast.success(`"${event.title}" archived`);
+      } else {
+        await adminUnpublishEvent(event.id);
+        showToast.success(`"${event.title}" unpublished`);
       }
       fetchEvents();
     } catch (err: any) {
       showToast.error(err.message || 'Failed to update status');
+    } finally {
+      setPendingStatusEvent(null);
     }
   };
 
-  const handleArchive = async (event: Event) => {
-    try {
-      await adminArchiveEvent(event.id);
-      showToast.success(`"${event.title}" archived`);
-      fetchEvents();
-    } catch (err: any) {
-      showToast.error(err.message || 'Failed to archive event');
-    }
+  const handleToggleStatus = (event: Event) => {
+    const nextStatus = event.status === 'published' ? 'draft' : 'published';
+    setPendingStatusEvent({ event, targetStatus: nextStatus });
+  };
+
+  const handleArchive = (event: Event) => {
+    setPendingStatusEvent({ event, targetStatus: 'archived' });
   };
 
   const handleToggleFeatured = async (event: Event) => {
@@ -292,21 +304,32 @@ export const EventManager: React.FC = () => {
                     {/* Actions */}
                     <td className="py-4 px-4 text-right">
                       <div className="inline-flex items-center gap-1">
-                        {/* Status Toggle Button */}
-                        <button
-                          onClick={() => handleToggleStatus(event)}
-                          title={event.status === 'published' ? 'Unpublish' : 'Publish'}
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                        {/* Preview Button */}
+                        <Link
+                          to={`/admin/preview/event/${event.id}`}
+                          title="Preview Event"
+                          className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
                         >
-                          {event.status === 'published' ? (
-                            <EyeOff className="w-4 h-4 text-amber-400" />
-                          ) : (
-                            <Eye className="w-4 h-4 text-emerald-400" />
-                          )}
-                        </button>
+                          <Eye className="w-4 h-4 text-cyan-400" />
+                        </Link>
+
+                        {/* Status Toggle Button */}
+                        {canWrite && (
+                          <button
+                            onClick={() => handleToggleStatus(event)}
+                            title={event.status === 'published' ? 'Unpublish' : 'Publish'}
+                            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                          >
+                            {event.status === 'published' ? (
+                              <EyeOff className="w-4 h-4 text-amber-400" />
+                            ) : (
+                              <Eye className="w-4 h-4 text-emerald-400" />
+                            )}
+                          </button>
+                        )}
 
                         {/* Archive Button */}
-                        {event.status !== 'archived' && (
+                        {canWrite && event.status !== 'archived' && (
                           <button
                             onClick={() => handleArchive(event)}
                             title="Archive"
@@ -325,14 +348,16 @@ export const EventManager: React.FC = () => {
                           <Edit2 className="w-4 h-4" />
                         </Link>
 
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => setDeleteId(event.id)}
-                          title="Delete"
-                          className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {/* Delete Button (admin/super_admin only) */}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleteId(event.id)}
+                            title="Delete"
+                            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -375,6 +400,35 @@ export const EventManager: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Status Change Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={Boolean(pendingStatusEvent)}
+        title={
+          pendingStatusEvent?.targetStatus === 'published'
+            ? 'Publish Event to Live Website'
+            : pendingStatusEvent?.targetStatus === 'archived'
+            ? 'Archive Event'
+            : 'Unpublish Event (Move to Draft)'
+        }
+        message={
+          pendingStatusEvent?.targetStatus === 'published'
+            ? `Are you sure you want to publish "${pendingStatusEvent?.event.title}"? It will be immediately visible to all visitors on the public website.`
+            : pendingStatusEvent?.targetStatus === 'archived'
+            ? `Are you sure you want to archive "${pendingStatusEvent?.event.title}"? It will be removed from the main active events list.`
+            : `Are you sure you want to unpublish "${pendingStatusEvent?.event.title}"? Visitors will no longer be able to see it.`
+        }
+        confirmLabel={
+          pendingStatusEvent?.targetStatus === 'published'
+            ? 'Publish Now'
+            : pendingStatusEvent?.targetStatus === 'archived'
+            ? 'Archive Event'
+            : 'Unpublish Event'
+        }
+        confirmVariant={pendingStatusEvent?.targetStatus === 'published' ? 'primary' : 'warning'}
+        onConfirm={executeStatusChange}
+        onCancel={() => setPendingStatusEvent(null)}
+      />
 
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog

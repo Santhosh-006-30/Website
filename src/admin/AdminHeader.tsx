@@ -1,5 +1,5 @@
 import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, ExternalLink } from 'lucide-react';
+import { ChevronRight, ExternalLink, Shield } from 'lucide-react';
 import { MobileMenuButton } from './AdminSidebar';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -20,12 +20,20 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/admin/team': 'Leadership',
   '/admin/content': 'Website Content',
   '/admin/settings': 'Settings',
+  '/admin/activity': 'Activity Log',
+  '/admin/users': 'User Governance',
+  '/admin/profile': 'Admin Profile',
 };
 
 function getBreadcrumbs(pathname: string): { label: string; to: string }[] {
   const crumbs: { label: string; to: string }[] = [
     { label: 'Admin', to: '/admin' },
   ];
+
+  if (pathname.includes('/admin/preview/')) {
+    crumbs.push({ label: 'Preview', to: pathname });
+    return crumbs;
+  }
 
   const segments = pathname.split('/').filter(Boolean);
   let path = '';
@@ -46,7 +54,7 @@ function getBreadcrumbs(pathname: string): { label: string; to: string }[] {
 
 export function AdminHeader({ onMobileMenuOpen }: AdminHeaderProps) {
   const location = useLocation();
-  const { profile } = useAuth();
+  const { profile, role } = useAuth();
   const breadcrumbs = getBreadcrumbs(location.pathname);
 
   return (
@@ -87,24 +95,43 @@ export function AdminHeader({ onMobileMenuOpen }: AdminHeaderProps) {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#D7B65A] transition-colors"
+          className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#D7B65A] transition-colors"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           Public Site
         </a>
 
-        {/* User avatar */}
+        {/* Role badge */}
+        {role && (
+          <span
+            className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono border ${
+              role === 'super_admin'
+                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                : role === 'admin'
+                ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                : role === 'editor'
+                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                : 'bg-slate-500/15 text-slate-300 border-slate-500/30'
+            }`}
+          >
+            <Shield className="w-3 h-3" />
+            {role.replace('_', ' ')}
+          </span>
+        )}
+
+        {/* User avatar linking to Profile */}
         {profile && (
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-[#D7B65A] flex-shrink-0"
+          <Link
+            to="/admin/profile"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-[#D7B65A] hover:scale-105 transition-transform flex-shrink-0"
             style={{
               background: 'rgba(215,182,90,0.15)',
               border: '1px solid rgba(215,182,90,0.3)',
             }}
-            title={profile.email}
+            title={`${profile.full_name || profile.email} (View Profile)`}
           >
             {(profile.full_name ?? profile.email)?.[0]?.toUpperCase() ?? 'A'}
-          </div>
+          </Link>
         )}
       </div>
     </header>

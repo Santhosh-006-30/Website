@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { GalleryAlbum, GalleryImage, PaginatedResult, PaginationOptions } from '../types/supabase';
+import { logAuditEvent } from './audit';
 
 export async function getPublishedGalleryImages(): Promise<GalleryImage[]> {
   if (!supabase) return [];
@@ -74,6 +75,12 @@ export async function adminCreateAlbum(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'CREATE',
+    entityType: 'gallery_album',
+    entityId: data.id,
+    entityName: data.title,
+  });
   return data;
 }
 
@@ -89,6 +96,13 @@ export async function adminUpdateAlbum(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPDATE',
+    entityType: 'gallery_album',
+    entityId: data.id,
+    entityName: data.title,
+    metadata: { fields: Object.keys(updates) },
+  });
   return data;
 }
 
@@ -96,6 +110,11 @@ export async function adminDeleteAlbum(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('gallery_albums').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE',
+    entityType: 'gallery_album',
+    entityId: id,
+  });
 }
 
 export async function adminGetAlbumImages(albumId: string): Promise<GalleryImage[]> {
@@ -143,6 +162,13 @@ export async function adminAddGalleryImage(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPLOAD',
+    entityType: 'gallery_image',
+    entityId: data.id,
+    entityName: data.title ?? undefined,
+    metadata: { album_id: data.album_id, image_url: data.image_url },
+  });
   return data;
 }
 
@@ -158,6 +184,12 @@ export async function adminUpdateGalleryImage(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPDATE',
+    entityType: 'gallery_image',
+    entityId: data.id,
+    entityName: data.title ?? undefined,
+  });
   return data;
 }
 
@@ -165,6 +197,11 @@ export async function adminDeleteGalleryImage(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('gallery_images').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE_IMAGE',
+    entityType: 'gallery_image',
+    metadata: { image_id: id },
+  });
 }
 
 export async function adminGetGalleryStats(): Promise<{ total: number; albums: number }> {

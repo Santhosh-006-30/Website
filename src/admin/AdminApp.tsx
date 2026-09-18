@@ -15,6 +15,12 @@ import { TeamManager } from './team/TeamManager';
 import { TeamMemberForm } from './team/TeamMemberForm';
 import { ContentManager } from './content/ContentManager';
 import { SettingsManager } from './settings/SettingsManager';
+import { ActivityLog } from './activity/ActivityLog';
+import { UserManager } from './users/UserManager';
+import { ProfilePage } from './profile/ProfilePage';
+import { EventPreview } from './preview/EventPreview';
+import { PostPreview } from './preview/PostPreview';
+import { ProjectPreview } from './preview/ProjectPreview';
 
 export const AdminApp: React.FC = () => {
   return (
@@ -60,6 +66,34 @@ export const AdminApp: React.FC = () => {
 
         {/* Site Settings */}
         <Route path="settings" element={<SettingsManager />} />
+
+        {/* Content Previews */}
+        <Route path="preview/event/:id" element={<EventPreview />} />
+        <Route path="preview/post/:id" element={<PostPreview />} />
+        <Route path="preview/project/:id" element={<ProjectPreview />} />
+
+        {/* Audit & Activity Log (Admin and Super Admin) */}
+        <Route
+          path="activity"
+          element={
+            <AdminRoute minRole="admin">
+              <ActivityLog />
+            </AdminRoute>
+          }
+        />
+
+        {/* User & Role Governance (Super Admin only) */}
+        <Route
+          path="users"
+          element={
+            <AdminRoute minRole="super_admin">
+              <UserManager />
+            </AdminRoute>
+          }
+        />
+
+        {/* Admin Personal Profile */}
+        <Route path="profile" element={<ProfilePage />} />
       </Route>
 
       {/* Fallback to admin home */}

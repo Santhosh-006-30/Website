@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { TeamMember, PaginatedResult, PaginationOptions } from '../types/supabase';
+import { logAuditEvent } from './audit';
 
 export async function getPublishedTeamMembers(): Promise<TeamMember[]> {
   if (!supabase) return [];
@@ -61,6 +62,13 @@ export async function adminCreateTeamMember(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'CREATE',
+    entityType: 'team_member',
+    entityId: data.id,
+    entityName: data.name,
+    metadata: { designation: data.designation },
+  });
   return data;
 }
 
@@ -76,6 +84,13 @@ export async function adminUpdateTeamMember(
     .select()
     .single();
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'UPDATE',
+    entityType: 'team_member',
+    entityId: data.id,
+    entityName: data.name,
+    metadata: { fields: Object.keys(updates) },
+  });
   return data;
 }
 
@@ -83,6 +98,11 @@ export async function adminDeleteTeamMember(id: string): Promise<void> {
   if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.from('team_members').delete().eq('id', id);
   if (error) throw new Error(error.message);
+  void logAuditEvent({
+    action: 'DELETE',
+    entityType: 'team_member',
+    entityId: id,
+  });
 }
 
 export async function adminReorderTeamMembers(
