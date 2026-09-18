@@ -46,6 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
     { name: "Projects", href: "#projects" },
     { name: "MAAYON", href: "#maayon" },
     { name: "Events", href: "#events" },
+    { name: "Careers", href: "/careers" },
     { name: "Journey", href: "#journey" },
     { name: "Leadership", href: "#leadership" },
     { name: "Gallery", href: "#gallery" },

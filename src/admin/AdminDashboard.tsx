@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom';
 import {
   Calendar, FileText, FolderKanban, Image, Users, Plus,
   TrendingUp, Clock, ArrowRight, Activity, ShieldCheck,
-  Archive, Sparkles
+  Archive, Sparkles, Briefcase
 } from 'lucide-react';
 import { adminGetEventStats } from '../services/events';
 import { adminGetPostStats } from '../services/posts';
 import { adminGetGalleryStats } from '../services/gallery';
 import { adminGetProjectStats } from '../services/projects';
 import { adminGetTeamStats } from '../services/team';
+import { adminGetCareerStats } from '../services/careers';
 import { getRecentActivity } from '../services/audit';
 import type { AuditLog } from '../types/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,6 +22,7 @@ interface DashboardStats {
   gallery: { total: number; albums: number };
   projects: { total: number; published: number; featured: number };
   team: { total: number; published: number };
+  careers: { total: number; published: number; draft: number; archived: number; expired: number };
 }
 
 interface StatCardProps {
@@ -96,15 +98,16 @@ export function AdminDashboard() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const [events, posts, gallery, projects, team, logs] = await Promise.all([
+        const [events, posts, gallery, projects, team, careers, logs] = await Promise.all([
           adminGetEventStats(),
           adminGetPostStats(),
           adminGetGalleryStats(),
           adminGetProjectStats(),
           adminGetTeamStats(),
+          adminGetCareerStats(),
           getRecentActivity(6),
         ]);
-        setStats({ events, posts, gallery, projects, team });
+        setStats({ events, posts, gallery, projects, team, careers });
         setRecentLogs(logs);
       } catch (err) {
         console.error('Dashboard stats error:', err);
@@ -213,6 +216,14 @@ export function AdminDashboard() {
           accentColor="#2dd4bf"
         />
         <StatCard
+          label="Careers & Opps"
+          value={stats?.careers.total ?? 0}
+          sub={`${stats?.careers.published ?? 0} published • ${stats?.careers.expired ?? 0} expired`}
+          icon={<Briefcase className="w-5 h-5" />}
+          to="/admin/careers"
+          accentColor="#38bdf8"
+        />
+        <StatCard
           label="Archived Events"
           value={stats?.events.archived ?? 0}
           sub="Preserved records"
@@ -239,6 +250,7 @@ export function AdminDashboard() {
             </h2>
             <div className="space-y-2.5">
               <QuickAction to="/admin/events/new" icon={<Plus className="w-4 h-4" />} label="Create Event" />
+              <QuickAction to="/admin/careers/new" icon={<Plus className="w-4 h-4" />} label="Post Opportunity" />
               <QuickAction to="/admin/posts/new" icon={<Plus className="w-4 h-4" />} label="Write New Post" />
               <QuickAction to="/admin/gallery" icon={<Image className="w-4 h-4" />} label="Upload Gallery Photos" />
               {isAdmin && (

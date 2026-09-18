@@ -66,6 +66,11 @@ export interface Database {
         Insert: Omit<AuditLog, 'id' | 'created_at'>;
         Update: never; // Audit logs are append-only
       };
+      careers: {
+        Row: Career;
+        Insert: Omit<Career, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<Career, 'id'>>;
+      };
     };
     Functions: {
       is_admin: { Args: Record<never, never>; Returns: boolean };
@@ -259,6 +264,64 @@ export interface SiteSetting {
 }
 
 // ============================================================
+// CAREERS & OPPORTUNITIES (Phase 25)
+// ============================================================
+
+export type CareerOpportunityType =
+  | 'job'
+  | 'internship'
+  | 'volunteer'
+  | 'project_role'
+  | 'fellowship'
+  | 'other';
+
+export type CareerWorkMode = 'on_site' | 'remote' | 'hybrid';
+
+export type CareerExperienceLevel =
+  | 'entry_level'
+  | 'intermediate'
+  | 'mid_level'
+  | 'senior_level'
+  | 'not_applicable';
+
+export type CareerStatus = 'draft' | 'published' | 'archived';
+
+export interface Career {
+  id: string;
+  title: string;
+  slug: string;
+  organization_name: string;
+  organization_website: string | null;
+  organization_logo_url: string | null;
+  opportunity_type: CareerOpportunityType;
+  work_mode: CareerWorkMode;
+  location: string | null;
+  experience_level: CareerExperienceLevel | null;
+  remuneration: string | null;
+  application_deadline: string | null;
+  application_url: string;
+  application_label: string | null;
+  description: string;
+  responsibilities: string | null;
+  requirements: string | null;
+  preferred_skills: string | null;
+  benefits: string | null;
+  additional_information: string | null;
+  contact_email: string | null;
+  status: CareerStatus;
+  featured: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+}
+
+export type CareerFormData = Omit<
+  Career,
+  'id' | 'created_at' | 'updated_at' | 'created_by' | 'updated_by'
+>;
+
+// ============================================================
 // AUDIT LOG (Phase 24)
 // ============================================================
 
@@ -285,7 +348,8 @@ export type AuditEntityType =
   | 'profile'
   | 'site_setting'
   | 'website_content'
-  | 'session';
+  | 'session'
+  | 'career';
 
 export interface AuditLog {
   id: string;

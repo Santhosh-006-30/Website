@@ -7,6 +7,7 @@ import { WhatWeDo } from "./components/WhatWeDo";
 import { FeaturedProjects } from "./components/FeaturedProjects";
 import { MaayonSection } from "./components/MaayonSection";
 import { Events } from "./components/Events";
+import { LatestOpportunities } from "./components/LatestOpportunities";
 import { Journey } from "./components/Journey";
 import { Leadership } from "./components/Leadership";
 import { Gallery } from "./components/Gallery";
@@ -68,6 +69,9 @@ export function App() {
 
         {/* Filterable Events Showcase with Detail Modal */}
         <Events />
+
+        {/* Professional Careers & Opportunities Module */}
+        <LatestOpportunities />
 
         {/* 13-Year Historical Timeline */}
         <Journey />

@@ -16,6 +16,8 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/admin/posts/new': 'New Post',
   '/admin/projects': 'Projects',
   '/admin/projects/new': 'New Project',
+  '/admin/careers': 'Careers',
+  '/admin/careers/new': 'New Opportunity',
   '/admin/gallery': 'Gallery',
   '/admin/team': 'Leadership',
   '/admin/content': 'Website Content',

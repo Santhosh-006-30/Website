@@ -36,6 +36,7 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
     { label: "Featured Projects", href: "#projects" },
     { label: "MAAYON 2026–27", href: "#maayon" },
     { label: "Events & Timeline", href: "#events" },
+    { label: "Careers & Opportunities", href: "/careers" },
     { label: "Our Journey", href: "#journey" },
     { label: "Leadership Board", href: "#leadership" },
     { label: "Photo Gallery", href: "#gallery" },

@@ -21,6 +21,9 @@ import { ProfilePage } from './profile/ProfilePage';
 import { EventPreview } from './preview/EventPreview';
 import { PostPreview } from './preview/PostPreview';
 import { ProjectPreview } from './preview/ProjectPreview';
+import { CareerPreview } from './preview/CareerPreview';
+import { CareersManager } from './careers/CareersManager';
+import { CareerForm } from './careers/CareerForm';
 
 export const AdminApp: React.FC = () => {
   return (
@@ -53,6 +56,11 @@ export const AdminApp: React.FC = () => {
         <Route path="projects/new" element={<ProjectForm />} />
         <Route path="projects/:id/edit" element={<ProjectForm />} />
 
+        {/* Careers & Opportunities CMS */}
+        <Route path="careers" element={<CareersManager />} />
+        <Route path="careers/new" element={<CareerForm />} />
+        <Route path="careers/:id/edit" element={<CareerForm />} />
+
         {/* Photo Gallery CMS */}
         <Route path="gallery" element={<GalleryManager />} />
 
@@ -71,6 +79,7 @@ export const AdminApp: React.FC = () => {
         <Route path="preview/event/:id" element={<EventPreview />} />
         <Route path="preview/post/:id" element={<PostPreview />} />
         <Route path="preview/project/:id" element={<ProjectPreview />} />
+        <Route path="preview/career/:id" element={<CareerPreview />} />
 
         {/* Audit & Activity Log (Admin and Super Admin) */}
         <Route

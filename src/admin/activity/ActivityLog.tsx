@@ -135,6 +135,7 @@ export const ActivityLog: React.FC = () => {
             <option value="profile">User Profile</option>
             <option value="site_setting">Site Setting</option>
             <option value="session">Session</option>
+            <option value="career">Career / Opportunity</option>
           </select>
         </div>
 

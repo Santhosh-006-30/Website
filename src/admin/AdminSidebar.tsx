@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Calendar, FileText, FolderKanban, Image,
   Users, Globe, Settings, LogOut, ChevronLeft, ChevronRight,
-  Shield, Menu, X, Activity, UserCog, User
+  Shield, Menu, X, Activity, UserCog, User, Briefcase
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -27,6 +27,7 @@ function SidebarContent({ collapsed, onLogout }: SidebarContentProps) {
     { to: '/admin/events', icon: <Calendar className="w-5 h-5" />, label: 'Events' },
     { to: '/admin/posts', icon: <FileText className="w-5 h-5" />, label: 'Posts' },
     { to: '/admin/projects', icon: <FolderKanban className="w-5 h-5" />, label: 'Projects' },
+    { to: '/admin/careers', icon: <Briefcase className="w-5 h-5" />, label: 'Careers' },
     { to: '/admin/gallery', icon: <Image className="w-5 h-5" />, label: 'Gallery' },
     { to: '/admin/team', icon: <Users className="w-5 h-5" />, label: 'Leadership' },
     { to: '/admin/content', icon: <Globe className="w-5 h-5" />, label: 'Website Content' },
