@@ -11,6 +11,7 @@ import {
   Users,
   Tag,
   AlertTriangle,
+  ArrowRight,
 } from 'lucide-react';
 import { getPublishedEventBySlug } from '../services/events';
 import { EVENTS } from '../data/events';
@@ -161,6 +162,12 @@ export const EventDetailPage: React.FC = () => {
       }
     : undefined;
 
+  const relatedEvents = event
+    ? EVENTS.filter((e) => e.slug !== event.slug)
+        .sort((a, _b) => (a.category === event.category ? -1 : 1))
+        .slice(0, 3)
+    : [];
+
   return (
     <div className="min-h-screen bg-[#07111F] text-slate-100 selection:bg-[#D7B65A]/30 selection:text-[#E8D89A] flex flex-col">
       {/* Event SEO */}
@@ -193,7 +200,7 @@ export const EventDetailPage: React.FC = () => {
           {/* Breadcrumb Navigation */}
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Link
-              to="/#events"
+              to="/events"
               className="inline-flex items-center gap-1.5 hover:text-[#D7B65A] transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -222,7 +229,7 @@ export const EventDetailPage: React.FC = () => {
               </p>
               <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
                 <Link
-                  to="/#events"
+                  to="/events"
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D7B65A] to-[#B3933B] text-[#07111F] font-bold text-xs hover:brightness-110 transition-all shadow-md shadow-[#D7B65A]/20"
                 >
                   <ArrowLeft className="w-4 h-4" />
@@ -415,6 +422,73 @@ export const EventDetailPage: React.FC = () => {
                 </div>
               </div>
             </article>
+          )}
+
+          {/* Related Events Section */}
+          {!loading && event && relatedEvents.length > 0 && (
+            <section className="pt-8 border-t border-white/10 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-[#D7B65A] mb-1">
+                    More From Rotaract LIA
+                  </h2>
+                  <h3 className="font-heading font-bold text-xl text-white">
+                    Related Events &amp; Initiatives
+                  </h3>
+                </div>
+                <Link
+                  to="/events"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D7B65A] hover:text-[#E8D89A] transition-colors"
+                >
+                  <span>View All Events</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {relatedEvents.map((rel) => (
+                  <Link
+                    key={rel.id}
+                    to={`/events/${rel.slug}`}
+                    className="glass-card glass-card-hover rounded-2xl overflow-hidden border border-white/10 group flex flex-col justify-between"
+                  >
+                    <div className="relative h-36 overflow-hidden">
+                      <img
+                        src={rel.image || '/assets/events/the-one.jpg'}
+                        alt={rel.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0B1728] via-transparent to-transparent" />
+                      <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[10px] text-slate-300">
+                        <span className="flex items-center space-x-1">
+                          <Calendar className="w-3 h-3 text-[#D7B65A]" />
+                          <span>{rel.displayDate}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-[#D7B65A]">
+                          {rel.category}
+                        </div>
+                        <h4 className="font-heading font-bold text-sm text-white group-hover:text-[#E8D89A] transition-colors line-clamp-1">
+                          {rel.title}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 line-clamp-2 mt-1">
+                          {rel.shortDescription || rel.description}
+                        </p>
+                      </div>
+                      <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-semibold text-[#D7B65A]">
+                        <span>Explore Record</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
           )}
         </div>
       </main>

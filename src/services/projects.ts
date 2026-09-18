@@ -28,6 +28,22 @@ export async function getPublishedFeaturedProjects(): Promise<Project[]> {
   return data ?? [];
 }
 
+export async function getPublishedProjectBySlug(slug: string): Promise<Project | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .maybeSingle();
+
+  if (error) {
+    console.error('[projects] getPublishedProjectBySlug error:', error.message);
+    return null;
+  }
+  return data;
+}
+
 export async function adminGetProjects(
   options: PaginationOptions & { status?: string; search?: string }
 ): Promise<PaginatedResult<Project>> {

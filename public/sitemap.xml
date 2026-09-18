@@ -12,4 +12,16 @@
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
+  <!-- Events & Initiatives Hub -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <!-- Signature Projects Hub -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/projects</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
 </urlset>

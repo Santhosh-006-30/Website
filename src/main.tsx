@@ -10,7 +10,10 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 const AdminApp = lazy(() => import('./admin/AdminApp').then(m => ({ default: m.AdminApp })));
 const CareersPage = lazy(() => import('./components/CareersPage').then(m => ({ default: m.CareersPage })));
 const CareerDetailPage = lazy(() => import('./components/CareerDetailPage').then(m => ({ default: m.CareerDetailPage })));
+const EventsPage = lazy(() => import('./components/EventsPage').then(m => ({ default: m.EventsPage })));
 const EventDetailPage = lazy(() => import('./components/EventDetailPage').then(m => ({ default: m.EventDetailPage })));
+const ProjectsPage = lazy(() => import('./components/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
+const ProjectDetailPage = lazy(() => import('./components/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
 const NotFoundPage = lazy(() => import('./components/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 const RouteLoadingFallback = () => (
@@ -29,7 +32,10 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/admin/*" element={<AdminApp />} />
               <Route path="/careers" element={<CareersPage />} />
               <Route path="/careers/:slug" element={<CareerDetailPage />} />
+              <Route path="/events" element={<EventsPage />} />
               <Route path="/events/:slug" element={<EventDetailPage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/projects/:slug" element={<ProjectDetailPage />} />
               <Route path="/" element={<App />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
