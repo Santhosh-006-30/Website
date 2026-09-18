@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /careers
+Allow: /careers/*
+Allow: /events
+Allow: /events/*
+Disallow: /admin
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /admin/login
+Disallow: /admin/preview
+Disallow: /admin/preview/*
+
+Sitemap: https://lia-website-six.vercel.app/sitemap.xml

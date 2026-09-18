@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowUpRight, Sparkles } from "lucide-react";
 import { CLUB_INFO } from "../data/club";
@@ -8,11 +9,15 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
+  const location = useLocation();
+  const isHomepage = location.pathname === "/";
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
 
   useEffect(() => {
+    if (!isHomepage) return;
+
     const handleScroll = () => {
       if (window.scrollY > 40) {
         setIsScrolled(true);
@@ -20,7 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
         setIsScrolled(false);
       }
 
-      // Determine active section
+      // Determine active section on homepage
       const sections = ["about", "impact", "what-we-do", "projects", "maayon", "events", "journey", "leadership", "gallery", "contact"];
       const scrollPosition = window.scrollY + 200;
 
@@ -39,25 +44,25 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHomepage]);
 
-  const navLinks = [
-    { name: "About", href: "#about" },
-    { name: "Projects", href: "#projects" },
-    { name: "MAAYON", href: "#maayon" },
-    { name: "Events", href: "#events" },
-    { name: "Careers", href: "/careers" },
-    { name: "Journey", href: "#journey" },
-    { name: "Leadership", href: "#leadership" },
-    { name: "Gallery", href: "#gallery" },
-    { name: "Contact", href: "#contact" },
+  const navItems = [
+    { name: "About", targetId: "about" },
+    { name: "Projects", targetId: "projects" },
+    { name: "MAAYON", targetId: "maayon" },
+    { name: "Events", targetId: "events" },
+    { name: "Careers", path: "/careers" },
+    { name: "Journey", targetId: "journey" },
+    { name: "Leadership", targetId: "leadership" },
+    { name: "Gallery", targetId: "gallery" },
+    { name: "Contact", targetId: "contact" },
   ];
 
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
+          isScrolled || !isHomepage
             ? "py-3 bg-[#07111F]/85 backdrop-blur-xl border-b border-white/10 shadow-2xl shadow-black/40"
             : "py-5 bg-transparent"
         }`}
@@ -65,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           {/* Logo & Permanent Identity */}
           <a
-            href="#hero"
+            href={isHomepage ? "#hero" : "/#hero"}
             className="flex items-center space-x-2.5 sm:space-x-3.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A] rounded-lg p-1 min-w-0"
           >
             <div className="relative shrink-0">
@@ -93,20 +98,29 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 xl:space-x-2 bg-white/[0.03] border border-white/10 backdrop-blur-md px-3 xl:px-4 py-1.5 rounded-full shadow-inner">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.href.substring(1);
+          <nav aria-label="Main Navigation" className="hidden lg:flex items-center space-x-1 xl:space-x-2 bg-white/[0.03] border border-white/10 backdrop-blur-md px-3 xl:px-4 py-1.5 rounded-full shadow-inner">
+            {navItems.map((item) => {
+              const isCareers = Boolean(item.path);
+              const isActive = isCareers
+                ? location.pathname.startsWith("/careers")
+                : isHomepage && activeSection === item.targetId;
+              const href = isCareers
+                ? item.path!
+                : isHomepage
+                  ? `#${item.targetId}`
+                  : `/#${item.targetId}`;
+
               return (
                 <a
-                  key={link.name}
-                  href={link.href}
+                  key={item.name}
+                  href={href}
                   className={`px-2.5 xl:px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 relative ${
                     isActive
                       ? "text-white font-semibold"
                       : "text-slate-300 hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  {link.name}
+                  {item.name}
                   {isActive && (
                     <motion.div
                       layoutId="activeIndicator"
@@ -123,7 +137,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           <div className="hidden sm:flex items-center space-x-2.5 sm:space-x-3">
             {/* Presidential theme pill */}
             <a
-              href="#maayon"
+              href={isHomepage ? "#maayon" : "/#maayon"}
               className="hidden xl:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-[#10233D]/70 border border-[#D7B65A]/30 text-xs text-[#E8D89A] hover:border-[#D7B65A] transition-all group shrink-0"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#D7B65A] animate-pulse" />
@@ -132,7 +146,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
 
             <button
               onClick={onOpenJoinModal}
-              className="relative inline-flex items-center justify-center px-3.5 sm:px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#07111F] transition-all duration-300 bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] rounded-full hover:shadow-[0_0_20px_rgba(215,182,90,0.5)] active:scale-95 group overflow-hidden shrink-0"
+              className="relative inline-flex items-center justify-center px-3.5 sm:px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#07111F] transition-all duration-300 bg-gradient-to-r from-[#D7B65A] via-[#E8D89A] to-[#D7B65A] rounded-full hover:shadow-[0_0_20px_rgba(215,182,90,0.5)] active:scale-95 group overflow-hidden shrink-0 cursor-pointer"
             >
               <span className="relative z-10 flex items-center space-x-1.5">
                 <span>Join Us</span>
@@ -146,14 +160,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
           <div className="flex items-center space-x-2 lg:hidden shrink-0">
             <button
               onClick={onOpenJoinModal}
-              className="sm:hidden px-3 py-1.5 text-xs font-semibold text-[#07111F] bg-[#D7B65A] rounded-full active:scale-95 transition-transform"
+              className="sm:hidden px-3 py-1.5 text-xs font-semibold text-[#07111F] bg-[#D7B65A] rounded-full active:scale-95 transition-transform cursor-pointer"
             >
               Join
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white focus:outline-none active:scale-95"
-              aria-label="Toggle navigation menu"
+              className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A] active:scale-95 cursor-pointer"
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
@@ -185,17 +200,33 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                 </span>
               </div>
 
-              {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-3 rounded-lg text-base font-medium text-slate-200 hover:text-[#D7B65A] hover:bg-white/5 transition-colors flex items-center justify-between border border-transparent hover:border-white/5"
-                >
-                  <span>{link.name}</span>
-                  <ArrowUpRight className="w-4 h-4 text-slate-500" />
-                </a>
-              ))}
+              {navItems.map((item) => {
+                const isCareers = Boolean(item.path);
+                const isActive = isCareers
+                  ? location.pathname.startsWith("/careers")
+                  : isHomepage && activeSection === item.targetId;
+                const href = isCareers
+                  ? item.path!
+                  : isHomepage
+                    ? `#${item.targetId}`
+                    : `/#${item.targetId}`;
+
+                return (
+                  <a
+                    key={item.name}
+                    href={href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-4 py-3 rounded-lg text-base font-medium transition-colors flex items-center justify-between border ${
+                      isActive
+                        ? "text-[#D7B65A] bg-[#D7B65A]/10 border-[#D7B65A]/30 font-semibold"
+                        : "text-slate-200 hover:text-[#D7B65A] hover:bg-white/5 border-transparent"
+                    }`}
+                  >
+                    <span>{item.name}</span>
+                    <ArrowUpRight className="w-4 h-4 text-slate-500" />
+                  </a>
+                );
+              })}
 
               <div className="pt-4 border-t border-white/10 flex flex-col space-y-3">
                 <button

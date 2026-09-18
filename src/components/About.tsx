@@ -52,7 +52,8 @@ export const About = () => {
               <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4 mb-4">
                 <img
                   src="/assets/logos/lia-shield.png"
-                  alt="LIA Shield"
+                  alt="Rotaract Club of Lead India Ahead Official Shield Crest"
+                  loading="lazy"
                   className="h-12 sm:h-16 w-auto object-contain shrink-0"
                 />
                 <div>

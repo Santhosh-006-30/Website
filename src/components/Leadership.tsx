@@ -248,6 +248,7 @@ export const Leadership = () => {
                   <img
                     src={selectedLetter.letterImage}
                     alt={`Appointment letter of ${selectedLetter.name}`}
+                    loading="lazy"
                     className="max-h-[65vh] sm:max-h-[72vh] w-auto max-w-full object-contain rounded shadow-lg"
                   />
                 )}

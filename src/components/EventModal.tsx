@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar, MapPin, ShieldCheck, Users, Tag, ExternalLink } from "lucide-react";
 import type { Event } from "../types";
@@ -154,21 +155,29 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
               </div>
             )}
 
-            {/* Official Source Link */}
-            {event.source?.url && (
-              <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Official Social Record</span>
+            {/* Action Bar: Dedicated Page & Source */}
+            <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+              <Link
+                to={`/events/${event.slug}`}
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D7B65A]/15 text-[#E8D89A] border border-[#D7B65A]/30 text-xs font-semibold hover:bg-[#D7B65A]/25 transition-colors cursor-pointer"
+              >
+                <span>Open Dedicated Event Page</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+
+              {event.source?.url && (
                 <a
                   href={event.source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-1.5 text-xs font-semibold text-[#D7B65A] hover:underline"
+                  className="inline-flex items-center space-x-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors"
                 >
-                  <span>View Original {event.source.platform} Post</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Original {event.source.platform} Post</span>
+                  <ExternalLink className="w-3 h-3" />
                 </a>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </motion.div>
       </div>

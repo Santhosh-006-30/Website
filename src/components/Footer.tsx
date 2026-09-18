@@ -1,8 +1,9 @@
+import { useLocation } from "react-router-dom";
 import { ArrowUp, Mail, Phone, MapPin, Shield, Compass, Sparkles } from "lucide-react";
 import { CLUB_INFO } from "../data/club";
 
 const InstagramIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
     <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
@@ -10,7 +11,7 @@ const InstagramIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
 );
 
 const LinkedinIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
     <rect width="4" height="12" x="2" y="9" />
     <circle cx="4" cy="4" r="2" />
@@ -22,6 +23,9 @@ interface FooterProps {
 }
 
 export const Footer = ({ onOpenJoinModal }: FooterProps) => {
+  const location = useLocation();
+  const isHomepage = location.pathname === "/";
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -29,18 +33,18 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
     });
   };
 
-  const navLinks = [
-    { label: "About LIA", href: "#about" },
-    { label: "Our Impact", href: "#impact" },
-    { label: "What We Do", href: "#what-we-do" },
-    { label: "Featured Projects", href: "#projects" },
-    { label: "MAAYON 2026–27", href: "#maayon" },
-    { label: "Events & Timeline", href: "#events" },
-    { label: "Careers & Opportunities", href: "/careers" },
-    { label: "Our Journey", href: "#journey" },
-    { label: "Leadership Board", href: "#leadership" },
-    { label: "Photo Gallery", href: "#gallery" },
-    { label: "Contact Us", href: "#contact" },
+  const navItems = [
+    { label: "About LIA", targetId: "about" },
+    { label: "Our Impact", targetId: "impact" },
+    { label: "What We Do", targetId: "what-we-do" },
+    { label: "Featured Projects", targetId: "projects" },
+    { label: "MAAYON 2026–27", targetId: "maayon" },
+    { label: "Events & Timeline", targetId: "events" },
+    { label: "Careers & Opportunities", path: "/careers" },
+    { label: "Our Journey", targetId: "journey" },
+    { label: "Leadership Board", targetId: "leadership" },
+    { label: "Photo Gallery", targetId: "gallery" },
+    { label: "Contact Us", targetId: "contact" },
   ];
 
   return (
@@ -56,7 +60,7 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#10233D] to-[#07111F] border border-[#D7B65A]/40 flex items-center justify-center shadow-lg shadow-black/40 overflow-hidden p-1 shrink-0">
                 <img
                   src="/assets/logos/lia-shield.png"
-                  alt="LIA Shield"
+                  alt="Rotaract Club of Lead India Ahead Official Shield Crest"
                   className="w-full h-full object-contain"
                 />
               </div>
@@ -93,16 +97,24 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
               <span>Explore</span>
             </h3>
             <ul className="grid grid-cols-2 gap-2.5 text-sm text-slate-400">
-              {navLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="hover:text-[#D7B65A] transition-colors inline-block py-0.5"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              {navItems.map((item) => {
+                const href = item.path
+                  ? item.path
+                  : isHomepage
+                    ? `#${item.targetId}`
+                    : `/#${item.targetId}`;
+
+                return (
+                  <li key={item.label}>
+                    <a
+                      href={href}
+                      className="hover:text-[#D7B65A] transition-colors inline-block py-0.5"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -157,8 +169,8 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
                 href={CLUB_INFO.contact.instagramUrl}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Instagram"
-                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-[#D7B65A]/50 hover:bg-[#D7B65A]/10 text-slate-300 hover:text-[#D7B65A] flex items-center justify-center transition-all"
+                aria-label="Official Instagram of Rotaract Club of Lead India Ahead"
+                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-[#D7B65A]/50 hover:bg-[#D7B65A]/10 text-slate-300 hover:text-[#D7B65A] flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A]"
               >
                 <InstagramIcon className="w-4 h-4" />
               </a>
@@ -166,8 +178,8 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
                 href={CLUB_INFO.contact.linkedinUrl}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="LinkedIn"
-                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-[#D7B65A]/50 hover:bg-[#D7B65A]/10 text-slate-300 hover:text-[#D7B65A] flex items-center justify-center transition-all"
+                aria-label="Official LinkedIn of Rotaract Club of Lead India Ahead"
+                className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-[#D7B65A]/50 hover:bg-[#D7B65A]/10 text-slate-300 hover:text-[#D7B65A] flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A]"
               >
                 <LinkedinIcon className="w-4 h-4" />
               </a>

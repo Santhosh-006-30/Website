@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft,
   Edit3,
@@ -258,7 +259,7 @@ export const CareerPreview: React.FC = () => {
           </h2>
           <div
             className="prose prose-invert max-w-none text-slate-300 text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: career.description }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(career.description) }}
           />
         </div>
 

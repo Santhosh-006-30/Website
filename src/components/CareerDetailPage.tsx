@@ -23,6 +23,8 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { JoinUs } from './JoinUs';
 
+import { SEO } from './SEO';
+
 export const CareerDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [career, setCareer] = useState<Career | null>(null);
@@ -39,22 +41,6 @@ export const CareerDetailPage: React.FC = () => {
       try {
         const data = await getCareerBySlug(slug!);
         setCareer(data);
-        if (data) {
-          document.title = `${data.title} at ${data.organization_name} | Rotaract Club of LIA`;
-          // Meta description for SEO
-          let metaDesc = document.querySelector('meta[name="description"]');
-          if (!metaDesc) {
-            metaDesc = document.createElement('meta');
-            (metaDesc as HTMLMetaElement).name = 'description';
-            document.head.appendChild(metaDesc);
-          }
-          (metaDesc as HTMLMetaElement).content =
-            `${data.title} at ${data.organization_name}. ${
-              data.opportunity_type.replace('_', ' ')
-            } opportunity — ${data.work_mode.replace('_', '-')} | Apply now on Rotaract Club of Lead India Ahead.`;
-        } else {
-          document.title = 'Opportunity Not Found | Rotaract Club of LIA';
-        }
       } catch (err) {
         console.error('Failed to load career:', err);
       } finally {
@@ -63,6 +49,52 @@ export const CareerDetailPage: React.FC = () => {
     }
     void load();
   }, [slug]);
+
+  // Check expiration (deadline plus grace period of day)
+  const isExpired = career?.application_deadline
+    ? new Date(career.application_deadline).getTime() < Date.now() - 24 * 60 * 60 * 1000
+    : false;
+
+  const isEligibleForJobPosting = Boolean(career && career.status === 'published' && !isExpired);
+
+  const employmentTypeMap: Record<string, string> = {
+    job: 'FULL_TIME',
+    internship: 'INTERN',
+    volunteer: 'VOLUNTEER',
+    project_role: 'CONTRACTOR',
+    fellowship: 'OTHER',
+  };
+
+  // Construct valid JobPosting structured data without inventing fields
+  const jobPostingJsonLd = isEligibleForJobPosting && career ? {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: career.title,
+    description: career.description || career.title,
+    datePosted: career.created_at,
+    ...(career.application_deadline ? { validThrough: new Date(career.application_deadline).toISOString() } : {}),
+    ...(employmentTypeMap[career.opportunity_type] ? { employmentType: employmentTypeMap[career.opportunity_type] } : {}),
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: career.organization_name,
+      ...(career.organization_website ? { sameAs: career.organization_website } : {}),
+      ...(career.organization_logo_url ? { logo: career.organization_logo_url } : {}),
+    },
+    ...(career.work_mode === 'remote'
+      ? { jobLocationType: 'TELECOMMUTE' }
+      : career.location
+        ? {
+            jobLocation: {
+              '@type': 'Place',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: career.location,
+                addressCountry: 'IN',
+              },
+            },
+          }
+        : {}),
+  } : undefined;
 
   /**
    * Returns the URL only if it is a safe https:// link.
@@ -115,6 +147,26 @@ export const CareerDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#07111F] text-slate-100 selection:bg-[#D7B65A]/30 selection:text-[#E8D89A] flex flex-col">
+      {/* Opportunity SEO */}
+      <SEO
+        title={
+          loading
+            ? 'Loading Opportunity...'
+            : career
+              ? `${career.title} at ${career.organization_name}`
+              : 'Opportunity Not Found'
+        }
+        description={
+          career
+            ? `${career.title} at ${career.organization_name}. ${career.opportunity_type.replace('_', ' ')} opportunity — ${career.work_mode.replace('_', '-')} | Apply on Rotaract Club of Lead India Ahead.`
+            : 'Explore youth opportunities, jobs, and internships curated by the Rotaract Club of Lead India Ahead.'
+        }
+        canonicalPath={career ? `/careers/${career.slug}` : undefined}
+        ogImage={career?.organization_logo_url || null}
+        noindex={!loading && !career}
+        jsonLd={jobPostingJsonLd}
+      />
+
       {/* Top Navbar */}
       <Navbar onOpenJoinModal={() => setIsJoinModalOpen(true)} />
 

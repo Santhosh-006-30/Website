@@ -36,6 +36,22 @@ export async function getPublishedEventImages(eventId: string): Promise<EventIma
   return data ?? [];
 }
 
+export async function getPublishedEventBySlug(slug: string): Promise<Event | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .maybeSingle();
+
+  if (error) {
+    console.error('[events] getPublishedEventBySlug error:', error.message);
+    return null;
+  }
+  return data;
+}
+
 // ============================================================
 // ADMIN SERVICE — used by admin CMS components
 // ============================================================

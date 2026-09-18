@@ -20,6 +20,9 @@ import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 import { JoinUs } from './JoinUs';
 
+import { SEO } from './SEO';
+import { SITE_CONFIG, getCanonicalUrl } from '../config/site';
+
 export const CareersPage: React.FC = () => {
   const [careers, setCareers] = useState<Career[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,18 +32,7 @@ export const CareersPage: React.FC = () => {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
 
   useEffect(() => {
-    document.title = 'Careers & Opportunities | Rotaract Club of Lead India Ahead';
     window.scrollTo({ top: 0, behavior: 'instant' });
-
-    // SEO meta description
-    let metaDesc = document.querySelector('meta[name="description"]');
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      (metaDesc as HTMLMetaElement).name = 'description';
-      document.head.appendChild(metaDesc);
-    }
-    (metaDesc as HTMLMetaElement).content =
-      'Explore verified job, internship, fellowship, and volunteer opportunities curated by the Rotaract Club of Lead India Ahead for ambitious young professionals across District 3206.';
 
     async function load() {
       try {
@@ -54,6 +46,20 @@ export const CareersPage: React.FC = () => {
     }
     void load();
   }, []);
+
+  const collectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Careers & Opportunities | Rotaract Club of Lead India Ahead',
+    description:
+      'Explore verified job, internship, fellowship, and volunteer opportunities curated by the Rotaract Club of Lead India Ahead for ambitious young professionals across District 3206.',
+    url: getCanonicalUrl('/careers'),
+    isPartOf: {
+      '@type': 'WebSite',
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.siteUrl,
+    },
+  };
 
   const filteredCareers = useMemo(() => {
     return careers.filter((item) => {
@@ -100,6 +106,14 @@ export const CareersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#07111F] text-slate-100 selection:bg-[#D7B65A]/30 selection:text-[#E8D89A] flex flex-col">
+      {/* Careers Hub SEO */}
+      <SEO
+        title="Careers & Opportunities"
+        description="Explore verified job, internship, fellowship, and volunteer opportunities curated by the Rotaract Club of Lead India Ahead for ambitious young professionals across District 3206."
+        canonicalPath="/careers"
+        jsonLd={collectionJsonLd}
+      />
+
       {/* Brand Navigation */}
       <Navbar onOpenJoinModal={() => setIsJoinModalOpen(true)} />
 
@@ -268,6 +282,7 @@ export const CareersPage: React.FC = () => {
                             <img
                               src={career.organization_logo_url}
                               alt={career.organization_name}
+                              loading="lazy"
                               className="w-12 h-12 rounded-xl object-contain bg-white/5 p-1 border border-white/10 flex-shrink-0"
                             />
                           ) : (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { About } from "./components/About";
@@ -14,9 +14,37 @@ import { Gallery } from "./components/Gallery";
 import { JoinUs } from "./components/JoinUs";
 import { Contact } from "./components/Contact";
 import { Footer } from "./components/Footer";
+import { SEO } from "./components/SEO";
+import { CLUB_INFO } from "./data/club";
+import { SITE_CONFIG } from "./config/site";
 
 export function App() {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+
+  // Cross-page hash navigation handler (e.g. landing on /#events or /#about from other pages)
+  useEffect(() => {
+    if (window.location.hash) {
+      const targetId = window.location.hash.replace('#', '');
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        const observer = new MutationObserver(() => {
+          const target = document.getElementById(targetId);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        const timer = setTimeout(() => observer.disconnect(), 2500);
+        return () => {
+          observer.disconnect();
+          clearTimeout(timer);
+        };
+      }
+    }
+  }, []);
 
   const handleOpenJoinModal = () => {
     setIsJoinModalOpen(true);
@@ -40,8 +68,47 @@ export function App() {
     }
   };
 
+  // Verified Organization JSON-LD Schema
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": SITE_CONFIG.organization.name,
+    "alternateName": SITE_CONFIG.organization.alternateName,
+    "url": SITE_CONFIG.siteUrl,
+    "logo": `${SITE_CONFIG.siteUrl}/assets/logos/lia-shield.png`,
+    "foundingDate": `${SITE_CONFIG.organization.established}`,
+    "parentOrganization": {
+      "@type": "Organization",
+      "name": SITE_CONFIG.organization.sponsorClub,
+    },
+    "location": {
+      "@type": "Place",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Coimbatore",
+        "addressRegion": "Tamil Nadu",
+        "addressCountry": "IN",
+      },
+    },
+    "sameAs": [
+      CLUB_INFO.contact.instagramUrl,
+      CLUB_INFO.contact.linkedinUrl,
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": CLUB_INFO.contact.email,
+      "contactType": "general inquiries",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#07111F] text-slate-100 selection:bg-[#D7B65A]/30 selection:text-[#E8D89A] flex flex-col">
+      {/* Official Structured SEO */}
+      <SEO
+        canonicalPath="/"
+        jsonLd={organizationJsonLd}
+      />
+
       {/* Navigation Header */}
       <Navbar onOpenJoinModal={handleOpenJoinModal} />
 

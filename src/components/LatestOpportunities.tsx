@@ -100,6 +100,7 @@ export const LatestOpportunities: React.FC = () => {
                       <img
                         src={item.organization_logo_url}
                         alt={item.organization_name}
+                        loading="lazy"
                         className="w-10 h-10 rounded-xl object-contain bg-white/5 p-1 border border-white/10 flex-shrink-0"
                       />
                     ) : (

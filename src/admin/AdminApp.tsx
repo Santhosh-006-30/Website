@@ -24,12 +24,16 @@ import { ProjectPreview } from './preview/ProjectPreview';
 import { CareerPreview } from './preview/CareerPreview';
 import { CareersManager } from './careers/CareersManager';
 import { CareerForm } from './careers/CareerForm';
+import { SEO } from '../components/SEO';
 
 export const AdminApp: React.FC = () => {
   return (
-    <Routes>
-      {/* Public Login Route */}
-      <Route path="login" element={<AdminLogin />} />
+    <>
+      {/* Strict noindex for all admin and preview CMS routes */}
+      <SEO title="LIA Admin CMS" noindex={true} />
+      <Routes>
+        {/* Public Login Route */}
+        <Route path="login" element={<AdminLogin />} />
 
       {/* Protected Admin Routes */}
       <Route
@@ -108,5 +112,6 @@ export const AdminApp: React.FC = () => {
       {/* Fallback to admin home */}
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
-  );
+  </>
+);
 };
