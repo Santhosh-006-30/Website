@@ -222,6 +222,9 @@ export const Gallery = () => {
             {/* Content Modal */}
             <motion.div
               key={selectedPhotoIndex}
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Photo preview: ${filteredItems[selectedPhotoIndex].title}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}

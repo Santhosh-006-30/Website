@@ -155,6 +155,7 @@ export const ProjectsPage: React.FC = () => {
                 <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
+                  aria-label="Search projects"
                   placeholder="Search projects by title, category, impact metrics..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
@@ -164,6 +165,7 @@ export const ProjectsPage: React.FC = () => {
 
               <div className="flex flex-wrap sm:flex-nowrap gap-3">
                 <select
+                  aria-label="Filter projects by category"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="px-3.5 py-2.5 rounded-xl bg-[#0c192e] border border-white/10 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-[#D7B65A]/50 cursor-pointer"
@@ -176,6 +178,7 @@ export const ProjectsPage: React.FC = () => {
                 </select>
 
                 <select
+                  aria-label="Filter projects by year"
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
                   className="px-3.5 py-2.5 rounded-xl bg-[#0c192e] border border-white/10 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-[#D7B65A]/50 cursor-pointer"

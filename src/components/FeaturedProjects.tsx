@@ -48,6 +48,18 @@ export const FeaturedProjects = () => {
     };
   }, []);
 
+  // Handle escape key for project modal
+  useEffect(() => {
+    if (!selectedProject) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedProject(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedProject]);
+
   // Asymmetric arrangement:
   const heroProject = projectsList[0] || PROJECTS[0];
   const sideProject1 = projectsList[1] || PROJECTS[1];
@@ -280,6 +292,9 @@ export const FeaturedProjects = () => {
 
             {/* Modal Dialog */}
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="project-modal-title"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -307,7 +322,7 @@ export const FeaturedProjects = () => {
                   <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-[#D7B65A] text-[#07111F]">
                     {selectedProject.category}
                   </span>
-                  <h3 className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white mt-1.5 leading-tight">
+                  <h3 id="project-modal-title" className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white mt-1.5 leading-tight">
                     {selectedProject.title}
                   </h3>
                 </div>

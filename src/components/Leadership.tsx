@@ -41,6 +41,18 @@ export const Leadership = () => {
     };
   }, []);
 
+  // Handle escape key for letter preview modal
+  useEffect(() => {
+    if (!selectedLetter) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedLetter(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedLetter]);
+
   const displayedMembers = activeTab === "EXECUTIVE"
     ? membersList.filter((m) => m.isExecutive)
     : membersList;
@@ -222,6 +234,9 @@ export const Leadership = () => {
             />
 
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="letter-modal-title"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -229,7 +244,7 @@ export const Leadership = () => {
             >
               <div className="flex items-center justify-between pb-3 border-b border-white/10 px-2">
                 <div className="min-w-0 pr-2">
-                  <div className="text-xs sm:text-sm font-heading font-bold text-white truncate">
+                  <div id="letter-modal-title" className="text-xs sm:text-sm font-heading font-bold text-white truncate">
                     Official Appointment Letter — {selectedLetter.name}
                   </div>
                   <div className="text-[11px] sm:text-xs text-[#D7B65A] truncate">{selectedLetter.position} • Rotary Year 2026–27</div>

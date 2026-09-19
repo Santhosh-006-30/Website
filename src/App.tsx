@@ -103,6 +103,14 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#07111F] text-slate-100 selection:bg-[#D7B65A]/30 selection:text-[#E8D89A] flex flex-col">
+      {/* Skip to Main Content for Screen Readers and Keyboard Navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#D7B65A] focus:text-[#07111F] focus:font-bold focus:rounded-xl focus:shadow-2xl focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Official Structured SEO */}
       <SEO
         canonicalPath="/"
@@ -112,7 +120,7 @@ export function App() {
       {/* Navigation Header */}
       <Navbar onOpenJoinModal={handleOpenJoinModal} />
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Full-bleed Hero Section */}
         <Hero
           onExploreClick={handleExploreClick}

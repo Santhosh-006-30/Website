@@ -50,6 +50,9 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="event-modal-title"
           className="relative w-full max-w-3xl glass-panel rounded-2xl sm:rounded-3xl overflow-hidden border border-white/20 shadow-2xl z-10 max-h-[92vh] flex flex-col"
         >
           {/* Close button */}
@@ -85,7 +88,7 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
                   {event.category}
                 </span>
               </div>
-              <h3 className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white leading-tight">
+              <h3 id="event-modal-title" className="font-heading font-extrabold text-xl sm:text-2xl md:text-3xl text-white leading-tight">
                 {event.title}
               </h3>
               {event.subtitle && (

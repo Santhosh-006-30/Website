@@ -16,6 +16,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
   const [activeSection, setActiveSection] = useState("hero");
 
   useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
     if (!isHomepage) return;
 
     const handleScroll = () => {
@@ -120,6 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                 <a
                   key={item.name}
                   href={href}
+                  aria-current={isActive ? "page" : undefined}
                   className={`px-2.5 xl:px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 relative ${
                     isActive
                       ? "text-white font-semibold"
@@ -174,6 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg bg-white/5 border border-white/10 text-slate-300 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D7B65A] active:scale-95 cursor-pointer"
               aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation-menu"
               aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6" />}
@@ -186,6 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
+            id="mobile-navigation-menu"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -226,6 +240,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                     key={item.name}
                     href={href}
                     onClick={() => setMobileMenuOpen(false)}
+                    aria-current={isActive ? "page" : undefined}
                     className={`px-4 py-3 rounded-lg text-base font-medium transition-colors flex items-center justify-between border ${
                       isActive
                         ? "text-[#D7B65A] bg-[#D7B65A]/10 border-[#D7B65A]/30 font-semibold"

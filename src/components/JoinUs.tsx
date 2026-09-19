@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle, Sparkles, X, Shield, Send } from "lucide-react";
 
@@ -18,6 +18,17 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onCloseModal();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen, onCloseModal]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +118,9 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
             />
 
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="join-modal-title"
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -126,7 +140,7 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
                     <div className="text-xs font-bold uppercase tracking-wider text-[#D7B65A] mb-1">
                       Membership & Volunteer Application
                     </div>
-                    <h3 className="font-heading font-extrabold text-2xl text-white">
+                    <h3 id="join-modal-title" className="font-heading font-extrabold text-2xl text-white">
                       Connect with Team LIA
                     </h3>
                     <p className="text-xs text-slate-400 mt-1">
@@ -136,12 +150,14 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                      <label htmlFor="join-name" className="block text-xs font-semibold text-slate-300 uppercase mb-1">
                         Full Name *
                       </label>
                       <input
+                        id="join-name"
                         type="text"
                         required
+                        autoComplete="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Your full name"
@@ -151,12 +167,14 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                        <label htmlFor="join-email" className="block text-xs font-semibold text-slate-300 uppercase mb-1">
                           Email Address *
                         </label>
                         <input
+                          id="join-email"
                           type="email"
                           required
+                          autoComplete="email"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                           placeholder="name@example.com"
@@ -164,12 +182,14 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                        <label htmlFor="join-phone" className="block text-xs font-semibold text-slate-300 uppercase mb-1">
                           Phone Number *
                         </label>
                         <input
+                          id="join-phone"
                           type="tel"
                           required
+                          autoComplete="tel"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           placeholder="+91 98765 43210"
@@ -179,10 +199,11 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                      <label htmlFor="join-college" className="block text-xs font-semibold text-slate-300 uppercase mb-1">
                         College / Organization
                       </label>
                       <input
+                        id="join-college"
                         type="text"
                         value={formData.college}
                         onChange={(e) => setFormData({ ...formData, college: e.target.value })}
@@ -192,10 +213,11 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 uppercase mb-1">
+                      <label htmlFor="join-interest" className="block text-xs font-semibold text-slate-300 uppercase mb-1">
                         Primary Area of Interest
                       </label>
                       <select
+                        id="join-interest"
                         value={formData.interest}
                         onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
                         className="w-full px-4 py-2.5 rounded-xl bg-[#0B1728] border border-white/10 text-white text-sm focus:outline-none focus:border-[#D7B65A] transition-colors"
