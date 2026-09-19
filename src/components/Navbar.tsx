@@ -77,6 +77,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
               <img
                 src="/assets/logos/lia-shield.png"
                 alt="Rotaract Club of Lead India Ahead Shield Logo"
+                loading="eager"
+                decoding="async"
                 className="h-9 sm:h-11 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
               />
               <div className="absolute -inset-1 bg-[#D7B65A]/20 blur-sm rounded-full -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />

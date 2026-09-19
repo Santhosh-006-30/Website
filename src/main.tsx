@@ -1,6 +1,7 @@
 import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import './index.css';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext';
@@ -29,27 +30,29 @@ const RouteLoadingFallback = () => (
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
-      <BrowserRouter>
-        <AnalyticsTracker />
-        <AuthProvider>
-          <Suspense fallback={<RouteLoadingFallback />}>
-            <Routes>
-              <Route path="/admin/*" element={<AdminApp />} />
-              <Route path="/careers" element={<CareersPage />} />
-              <Route path="/careers/:slug" element={<CareerDetailPage />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/events/:slug" element={<EventDetailPage />} />
-              <Route path="/projects" element={<ProjectsPage />} />
-              <Route path="/projects/:slug" element={<ProjectDetailPage />} />
-              <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/posts" element={<PostsPage />} />
-              <Route path="/posts/:slug" element={<PostDetailPage />} />
-              <Route path="/" element={<App />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </AuthProvider>
-      </BrowserRouter>
+      <MotionConfig reducedMotion="user">
+        <BrowserRouter>
+          <AnalyticsTracker />
+          <AuthProvider>
+            <Suspense fallback={<RouteLoadingFallback />}>
+              <Routes>
+                <Route path="/admin/*" element={<AdminApp />} />
+                <Route path="/careers" element={<CareersPage />} />
+                <Route path="/careers/:slug" element={<CareerDetailPage />} />
+                <Route path="/events" element={<EventsPage />} />
+                <Route path="/events/:slug" element={<EventDetailPage />} />
+                <Route path="/projects" element={<ProjectsPage />} />
+                <Route path="/projects/:slug" element={<ProjectDetailPage />} />
+                <Route path="/gallery" element={<GalleryPage />} />
+                <Route path="/posts" element={<PostsPage />} />
+                <Route path="/posts/:slug" element={<PostDetailPage />} />
+                <Route path="/" element={<App />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </AuthProvider>
+        </BrowserRouter>
+      </MotionConfig>
     </ErrorBoundary>
   </StrictMode>,
 );

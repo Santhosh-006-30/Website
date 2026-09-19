@@ -73,6 +73,8 @@ export const MaayonSection: React.FC = () => {
                 <img
                   src="/assets/logos/maayon-theme.png"
                   alt="MAAYON 2026-27 Official Logo"
+                  loading="lazy"
+                  decoding="async"
                   className="relative h-20 sm:h-28 md:h-36 w-auto object-contain filter drop-shadow-[0_8px_20px_rgba(0,0,0,0.8)]"
                 />
               </div>

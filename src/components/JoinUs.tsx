@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle, Sparkles, X, Shield, Send } from "lucide-react";
-import confetti from "canvas-confetti";
 
 interface JoinUsProps {
   isModalOpen: boolean;
@@ -20,17 +19,18 @@ export const JoinUs = ({ isModalOpen, onCloseModal, onOpenModal }: JoinUsProps) 
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitted(true);
     try {
+      const confetti = (await import("canvas-confetti")).default;
       confetti({
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
         colors: ["#D7B65A", "#06B6D4", "#10B981", "#E8D89A"],
       });
-    } catch (err) {
+    } catch {
       // Confetti fallback
     }
   };

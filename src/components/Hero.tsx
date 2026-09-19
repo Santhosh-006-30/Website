@@ -50,6 +50,9 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick, onMeetClick }) => {
               <img
                 src="/assets/logos/maayon-theme.png"
                 alt="MAAYON 2026-27 Presidential Theme Logo"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="h-14 sm:h-20 md:h-24 w-auto object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]"
               />
             </div>
