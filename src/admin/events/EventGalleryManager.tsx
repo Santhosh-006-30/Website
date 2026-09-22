@@ -32,7 +32,7 @@ export function EventGalleryManager({ eventId }: EventGalleryManagerProps) {
       setImages(data);
     } catch (err) {
       toast.error('Failed to load gallery images.');
-      console.error(err);
+      console.error('[EventGalleryManager] loadImages error:', err);
     } finally {
       setLoading(false);
     }
