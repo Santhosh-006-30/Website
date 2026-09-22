@@ -65,6 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
 
   const navItems = [
     { name: "About", targetId: "about" },
+    { name: "Impact", targetId: "impact" },
     { name: "Projects", targetId: "projects" },
     { name: "MAAYON", targetId: "maayon" },
     { name: "Events", targetId: "events" },
@@ -123,7 +124,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
               const isSubpageActive =
                 (item.targetId === "events" && location.pathname.startsWith("/events")) ||
                 (item.targetId === "projects" && location.pathname.startsWith("/projects")) ||
-                (item.targetId === "gallery" && location.pathname.startsWith("/gallery"));
+                (item.targetId === "gallery" && location.pathname.startsWith("/gallery")) ||
+                (item.targetId === "impact" && location.pathname.startsWith("/impact"));
               const isActive = isCareers
                 ? location.pathname.startsWith("/careers")
                 : isSubpageActive || (isHomepage && activeSection === item.targetId);
@@ -131,7 +133,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                 ? item.path!
                 : isHomepage
                   ? `#${item.targetId}`
-                  : `/#${item.targetId}`;
+                  : item.targetId === "impact"
+                    ? "/impact"
+                    : `/#${item.targetId}`;
 
               return (
                 <a
@@ -231,7 +235,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                 const isSubpageActive =
                   (item.targetId === "events" && location.pathname.startsWith("/events")) ||
                   (item.targetId === "projects" && location.pathname.startsWith("/projects")) ||
-                  (item.targetId === "gallery" && location.pathname.startsWith("/gallery"));
+                  (item.targetId === "gallery" && location.pathname.startsWith("/gallery")) ||
+                  (item.targetId === "impact" && location.pathname.startsWith("/impact"));
                 const isActive = isCareers
                   ? location.pathname.startsWith("/careers")
                   : isSubpageActive || (isHomepage && activeSection === item.targetId);
@@ -239,7 +244,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                   ? item.path!
                   : isHomepage
                     ? `#${item.targetId}`
-                    : `/#${item.targetId}`;
+                    : item.targetId === "impact"
+                      ? "/impact"
+                      : `/#${item.targetId}`;
 
                 return (
                   <a

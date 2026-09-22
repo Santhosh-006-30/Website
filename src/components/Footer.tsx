@@ -35,7 +35,7 @@ export const Footer = ({ onOpenJoinModal }: FooterProps) => {
 
   const navItems = [
     { label: "About LIA", targetId: "about" },
-    { label: "Our Impact", targetId: "impact" },
+    { label: "Our Impact", path: "/impact" },
     { label: "What We Do", targetId: "what-we-do" },
     { label: "Featured Projects", targetId: "projects" },
     { label: "MAAYON 2026–27", targetId: "maayon" },
