@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -8,6 +8,10 @@ import {
   ArrowRight,
   ShieldCheck,
   Tag,
+  LayoutGrid,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { EVENTS } from '../data/events';
 import type { Event as PublicEvent } from '../types';
@@ -17,6 +21,151 @@ import { Footer } from './Footer';
 import { JoinUs } from './JoinUs';
 import { SEO } from './SEO';
 import { SITE_CONFIG, getCanonicalUrl } from '../config/site';
+
+// ─── Lightweight Calendar Component ─────────────────────────────────────────
+const MONTH_NAMES = [
+  'January','February','March','April','May','June',
+  'July','August','September','October','November','December',
+];
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+interface CalendarViewProps {
+  events: PublicEvent[];
+  onSelectDate: (dateStr: string | null) => void;
+  selectedDate: string | null;
+}
+
+const EventCalendarView: React.FC<CalendarViewProps> = ({ events, onSelectDate, selectedDate }) => {
+  const today = new Date();
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
+
+  // Build a map of date -> events for quick lookup
+  const eventsByDate = useMemo(() => {
+    const map = new Map<string, PublicEvent[]>();
+    for (const ev of events) {
+      if (!ev.date) continue;
+      const key = ev.date.slice(0, 10); // YYYY-MM-DD
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(ev);
+    }
+    return map;
+  }, [events]);
+
+  const prevMonth = useCallback(() => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  }, [viewMonth]);
+
+  const nextMonth = useCallback(() => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  }, [viewMonth]);
+
+  // Grid cells: blank cells for leading days + days of month
+  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(firstDayOfMonth).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+
+  const handleDayClick = (day: number) => {
+    const mm = String(viewMonth + 1).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    const dateStr = `${viewYear}-${mm}-${dd}`;
+    onSelectDate(selectedDate === dateStr ? null : dateStr);
+  };
+
+  return (
+    <div className="glass-panel rounded-2xl border border-white/10 bg-[#0c192e]/60 overflow-hidden shadow-xl">
+      {/* Month Navigation */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+        <button
+          onClick={prevMonth}
+          aria-label="Previous month"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <h2 className="font-heading font-bold text-sm sm:text-base text-white tracking-wide">
+          {MONTH_NAMES[viewMonth]} {viewYear}
+        </h2>
+        <button
+          onClick={nextMonth}
+          aria-label="Next month"
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Day-of-week headers */}
+      <div className="grid grid-cols-7 border-b border-white/5">
+        {DAY_NAMES.map(d => (
+          <div key={d} className="py-2 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-px bg-white/5 p-1">
+        {cells.map((day, idx) => {
+          if (day === null) {
+            return <div key={`blank-${idx}`} className="bg-[#07111F]/60 rounded-lg h-12 sm:h-14" />;
+          }
+          const mm = String(viewMonth + 1).padStart(2, '0');
+          const dd = String(day).padStart(2, '0');
+          const dateStr = `${viewYear}-${mm}-${dd}`;
+          const dayEvents = eventsByDate.get(dateStr) || [];
+          const hasEvents = dayEvents.length > 0;
+          const isSelected = selectedDate === dateStr;
+          const isToday =
+            day === today.getDate() &&
+            viewMonth === today.getMonth() &&
+            viewYear === today.getFullYear();
+
+          return (
+            <button
+              key={dateStr}
+              onClick={() => hasEvents && handleDayClick(day)}
+              disabled={!hasEvents}
+              aria-label={`${day} ${MONTH_NAMES[viewMonth]}${hasEvents ? `, ${dayEvents.length} event(s)` : ''}`}
+              className={`relative flex flex-col items-center justify-start pt-1.5 h-12 sm:h-14 rounded-lg transition-all text-xs font-medium
+                ${isSelected ? 'bg-[#D7B65A]/20 border border-[#D7B65A]/50 text-[#E8D89A]' : ''}
+                ${!isSelected && hasEvents ? 'bg-white/[0.03] hover:bg-white/10 text-white cursor-pointer' : ''}
+                ${!hasEvents ? 'bg-transparent text-slate-600 cursor-default' : ''}
+                ${isToday && !isSelected ? 'ring-1 ring-[#06B6D4]/60' : ''}
+              `}
+            >
+              <span className={`text-[11px] font-semibold ${isToday ? 'text-[#06B6D4]' : ''}`}>{day}</span>
+              {hasEvents && (
+                <div className="flex gap-0.5 mt-0.5 flex-wrap justify-center px-1">
+                  {dayEvents.slice(0, 3).map((_, i) => (
+                    <span key={i} className={`w-1 h-1 rounded-full ${isSelected ? 'bg-[#D7B65A]' : 'bg-[#D7B65A]/70'}`} />
+                  ))}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Legend */}
+      <div className="px-6 py-3 flex items-center gap-4 text-[10px] text-slate-500 border-t border-white/5">
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-[#D7B65A]/70" />
+          Has event(s)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full border border-[#06B6D4]/60 bg-transparent" />
+          Today
+        </span>
+      </div>
+    </div>
+  );
+};
 
 function mapDbEventToPublicEvent(dbEvent: any): PublicEvent {
   return {
@@ -55,6 +204,8 @@ export const EventsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedYear, setSelectedYear] = useState('ALL');
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -107,9 +258,13 @@ export const EventsPage: React.FC = () => {
         selectedYear === 'ALL' ||
         String(ev.year) === selectedYear;
 
-      return matchesSearch && matchesCategory && matchesYear;
+      const matchesDate =
+        !selectedDate ||
+        (ev.date && ev.date.slice(0, 10) === selectedDate);
+
+      return matchesSearch && matchesCategory && matchesYear && matchesDate;
     });
-  }, [eventsList, search, selectedCategory, selectedYear]);
+  }, [eventsList, search, selectedCategory, selectedYear, selectedDate]);
 
   const categories = [
     { label: 'All Categories', value: 'ALL' },
@@ -275,19 +430,51 @@ export const EventsPage: React.FC = () => {
                     </option>
                   ))}
                 </select>
+
+                {/* View Mode Toggle */}
+                <div className="flex rounded-xl border border-white/10 overflow-hidden shrink-0" role="group" aria-label="Event view mode">
+                  <button
+                    id="view-grid-btn"
+                    onClick={() => { setViewMode('grid'); setSelectedDate(null); }}
+                    aria-pressed={viewMode === 'grid'}
+                    className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                      viewMode === 'grid'
+                        ? 'bg-[#D7B65A]/20 text-[#E8D89A] border-r border-[#D7B65A]/30'
+                        : 'bg-transparent text-slate-400 hover:text-white border-r border-white/10'
+                    }`}
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Grid</span>
+                  </button>
+                  <button
+                    id="view-calendar-btn"
+                    onClick={() => setViewMode('calendar')}
+                    aria-pressed={viewMode === 'calendar'}
+                    className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                      viewMode === 'calendar'
+                        ? 'bg-[#D7B65A]/20 text-[#E8D89A]'
+                        : 'bg-transparent text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <CalendarDays className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Calendar</span>
+                  </button>
+                </div>
               </div>
             </div>
 
             <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
               <span>
                 Showing {filteredEvents.length} {filteredEvents.length === 1 ? 'event' : 'events'}
+                {selectedDate && <span className="ml-1.5 text-[#D7B65A]">for {selectedDate}</span>}
               </span>
-              {(search || selectedCategory !== 'ALL' || selectedYear !== 'ALL') && (
+              {(search || selectedCategory !== 'ALL' || selectedYear !== 'ALL' || selectedDate) && (
                 <button
                   onClick={() => {
                     setSearch('');
                     setSelectedCategory('ALL');
                     setSelectedYear('ALL');
+                    setSelectedDate(null);
                   }}
                   className="text-[#D7B65A] hover:underline cursor-pointer"
                 >
@@ -297,21 +484,35 @@ export const EventsPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Calendar View */}
+          {viewMode === 'calendar' && (
+            <EventCalendarView
+              events={eventsList}
+              onSelectDate={setSelectedDate}
+              selectedDate={selectedDate}
+            />
+          )}
+
           {/* Events Grid */}
           {filteredEvents.length === 0 ? (
             <div className="glass-panel rounded-3xl border border-white/10 bg-[#0c192e]/30 p-12 text-center max-w-xl mx-auto space-y-4 shadow-xl">
               <div className="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 mx-auto flex items-center justify-center text-[#D7B65A]">
                 <Calendar className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-bold text-white">No events match your criteria</h3>
+              <h3 className="text-xl font-bold text-white">
+                {selectedDate ? `No events on ${selectedDate}` : 'No events match your criteria'}
+              </h3>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                Try adjusting your search terms or clearing selected category and year filters.
+                {selectedDate
+                  ? 'Select another date on the calendar or clear filters to see all events.'
+                  : 'Try adjusting your search terms or clearing selected category and year filters.'}
               </p>
               <button
                 onClick={() => {
                   setSearch('');
                   setSelectedCategory('ALL');
                   setSelectedYear('ALL');
+                  setSelectedDate(null);
                 }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[#D7B65A] border border-[#D7B65A]/30 text-xs font-semibold transition-colors cursor-pointer"
               >

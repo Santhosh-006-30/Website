@@ -409,6 +409,123 @@ export const ImpactPage: React.FC = () => {
           )}
         </section>
 
+        {/* ── Partners & Collaborations ─────────────────────── */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
+          <div className="flex items-start gap-4 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-[#06B6D4]/10 border border-[#06B6D4]/30 flex items-center justify-center text-[#06B6D4] shrink-0 mt-1">
+              <Users className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest text-[#06B6D4] mb-1">
+                Verified Network
+              </div>
+              <h2 className="font-heading font-extrabold text-2xl sm:text-3xl text-white tracking-tight">
+                Partners &amp; <span className="text-[#D7B65A]">Collaborations</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
+                Verified partner institutions and collaborative Rotaract/Rotary clubs that have actively co-organized events, co-hosted campaigns, and co-sponsored LIA's community initiatives during MAAYON 2026–27.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              {
+                name: 'Rotary Club of Coimbatore Texcity',
+                role: 'Sponsor & Charter Club',
+                type: 'PRIMARY SPONSOR',
+                typeColor: 'text-[#D7B65A] bg-[#D7B65A]/10 border-[#D7B65A]/30',
+                description: "Our founding sponsor and charter Rotary club since 2012 (Club ID: 90062), providing institutional support across all major events and installations.",
+              },
+              {
+                name: 'Rotaract District 3206',
+                role: 'District Body',
+                type: 'DISTRICT PARTNER',
+                typeColor: 'text-[#8B5CF6] bg-[#8B5CF6]/10 border-[#8B5CF6]/30',
+                description: 'Our Rotaract district authority guiding governance, efficiency metrics, and fellowship across all clubs in the district.',
+              },
+              {
+                name: 'Rotaract Club of SNS College of Technology',
+                role: 'Co-organizer, DHEEMA',
+                type: 'COLLABORATIVE CLUB',
+                typeColor: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
+                description: 'Collaborated on DHEEMA — World Hepatitis Day 2026 awareness campaign focused on viral hepatitis prevention and liver health.',
+              },
+              {
+                name: 'Rotaract Club of Coimbatore Unity',
+                role: 'Co-organizer, DHEEMA',
+                type: 'COLLABORATIVE CLUB',
+                typeColor: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
+                description: 'Joint co-organizer for the World Hepatitis Day 2026 public health awareness initiative.',
+              },
+              {
+                name: 'Rotaract Club of Coimbatore Gaalaxy',
+                role: 'Co-organizer, MIND MATTERS',
+                type: 'COLLABORATIVE CLUB',
+                typeColor: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
+                description: 'Partner club for the MIND MATTERS youth mental wellness forum held on International Youth Day 2025.',
+              },
+              {
+                name: 'Rotaract Club of KAHE',
+                role: 'Co-organizer, FUSION',
+                type: 'COLLABORATIVE CLUB',
+                typeColor: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
+                description: 'Joint organizer for FUSION — a professional leadership masterclass on high-performance team coordination.',
+              },
+              {
+                name: 'Coimbatore Eagles – New Life Sports Football Academy',
+                role: 'Co-organizer, Kids Football Tournament',
+                type: 'COMMUNITY PARTNER',
+                typeColor: 'text-[#10B981] bg-[#10B981]/10 border-[#10B981]/30',
+                description: 'Community sports partner for the 5-A-Side Kids Football Tournament 2026, supporting 120+ young athletes across 12 teams.',
+              },
+              {
+                name: 'Rotaract Club of HICAS',
+                role: 'MIND MATTERS & LAYOUT',
+                type: 'COLLABORATIVE CLUB',
+                typeColor: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
+                description: 'Co-hosted the youth mental health forum (MIND MATTERS) and co-organized the LAYOUT editorial skills workshop.',
+              },
+              {
+                name: 'Rotaract Club of Madras Cosmos',
+                role: 'Co-organizer, MIND MATTERS',
+                type: 'COLLABORATIVE CLUB',
+                typeColor: 'text-[#06B6D4] bg-[#06B6D4]/10 border-[#06B6D4]/30',
+                description: 'Participated in the cross-district youth mental health forum as part of the Mann Shakthi District Priority Project.',
+              },
+            ].map((partner) => (
+              <motion.div
+                key={partner.name}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3 }}
+                className="glass-card rounded-2xl border border-white/10 p-5 space-y-3 hover:border-white/20 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${partner.typeColor}`}>
+                    {partner.type}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-heading font-bold text-sm text-white leading-snug mb-0.5">
+                    {partner.name}
+                  </h3>
+                  <p className="text-[10px] font-semibold text-[#D7B65A] uppercase tracking-wider mb-2">
+                    {partner.role}
+                  </p>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    {partner.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
         {/* Verification Guarantee */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 text-center">
           <div className="glass-card rounded-2xl border border-white/10 p-6 sm:p-8 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-left">

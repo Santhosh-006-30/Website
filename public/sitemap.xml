@@ -3,48 +3,119 @@
   <!-- Homepage -->
   <url>
     <loc>https://lia-website-six.vercel.app/</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <!-- Careers & Opportunities Hub -->
   <url>
     <loc>https://lia-website-six.vercel.app/careers</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Impact & Milestones Hub -->
   <url>
     <loc>https://lia-website-six.vercel.app/impact</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Team & Leadership Hub -->
   <url>
     <loc>https://lia-website-six.vercel.app/team</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Events & Initiatives Hub -->
   <url>
     <loc>https://lia-website-six.vercel.app/events</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <!-- Event Detail: THE ONE (13th Installation 2026–27) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/the-one-13th-installation</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Event Detail: TAKEOFF (DRR Installation 2026–27) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/takeoff-drr-installation</loc>
+    <lastmod>2026-07-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Event Detail: FLIGHT PATH (Presidents & Secretaries Seminar) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/flight-path-presidents-secretaries-seminar</loc>
+    <lastmod>2026-06-07</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Event Detail: 5-A-Side Kids Football Tournament -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/kids-5-a-side-football-tournament</loc>
+    <lastmod>2026-06-21</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Event Detail: DHEEMA (World Hepatitis Day 2026) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/dheema-hepatitis-awareness</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Event Detail: MIND MATTERS (Mental Health 2025) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/mind-matters-mental-health</loc>
+    <lastmod>2025-08-12</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- Event Detail: NALAYA VIDIYAL 2.0 (Youth Football 2025) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/nalaya-vidiyal-youth-sports</loc>
+    <lastmod>2025-08-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- Event Detail: LAYOUT (Editorial & Design Workshop 2025) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/layout-editorial-workshop</loc>
+    <lastmod>2025-09-20</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <!-- Event Detail: FUSION (Leadership & Team Dynamics 2025) -->
+  <url>
+    <loc>https://lia-website-six.vercel.app/events/fusion-where-chaos-meets-coordination</loc>
+    <lastmod>2025-10-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
   </url>
   <!-- Signature Projects Hub -->
   <url>
     <loc>https://lia-website-six.vercel.app/projects</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <!-- Community Gallery Archive -->
   <url>
     <loc>https://lia-website-six.vercel.app/gallery</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <!-- Stories & News Publications -->
   <url>
     <loc>https://lia-website-six.vercel.app/posts</loc>
+    <lastmod>2026-09-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
