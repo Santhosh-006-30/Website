@@ -20,6 +20,7 @@ const GalleryPage = lazy(() => import('./components/GalleryPage').then(m => ({ d
 const PostsPage = lazy(() => import('./components/PostsPage').then(m => ({ default: m.PostsPage })));
 const PostDetailPage = lazy(() => import('./components/PostDetailPage').then(m => ({ default: m.PostDetailPage })));
 const ImpactPage = lazy(() => import('./components/ImpactPage').then(m => ({ default: m.ImpactPage })));
+const TeamPage = lazy(() => import('./components/TeamPage').then(m => ({ default: m.TeamPage })));
 const NotFoundPage = lazy(() => import('./components/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 const RouteLoadingFallback = () => (
@@ -48,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/posts" element={<PostsPage />} />
                 <Route path="/posts/:slug" element={<PostDetailPage />} />
                 <Route path="/impact" element={<ImpactPage />} />
+                <Route path="/team" element={<TeamPage />} />
                 <Route path="/" element={<App />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

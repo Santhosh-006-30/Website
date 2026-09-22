@@ -125,7 +125,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                 (item.targetId === "events" && location.pathname.startsWith("/events")) ||
                 (item.targetId === "projects" && location.pathname.startsWith("/projects")) ||
                 (item.targetId === "gallery" && location.pathname.startsWith("/gallery")) ||
-                (item.targetId === "impact" && location.pathname.startsWith("/impact"));
+                (item.targetId === "impact" && location.pathname.startsWith("/impact")) ||
+                (item.targetId === "leadership" && location.pathname.startsWith("/team"));
               const isActive = isCareers
                 ? location.pathname.startsWith("/careers")
                 : isSubpageActive || (isHomepage && activeSection === item.targetId);
@@ -135,7 +136,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                   ? `#${item.targetId}`
                   : item.targetId === "impact"
                     ? "/impact"
-                    : `/#${item.targetId}`;
+                    : item.targetId === "leadership"
+                      ? "/team"
+                      : `/#${item.targetId}`;
 
               return (
                 <a
@@ -236,7 +239,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                   (item.targetId === "events" && location.pathname.startsWith("/events")) ||
                   (item.targetId === "projects" && location.pathname.startsWith("/projects")) ||
                   (item.targetId === "gallery" && location.pathname.startsWith("/gallery")) ||
-                  (item.targetId === "impact" && location.pathname.startsWith("/impact"));
+                  (item.targetId === "impact" && location.pathname.startsWith("/impact")) ||
+                  (item.targetId === "leadership" && location.pathname.startsWith("/team"));
                 const isActive = isCareers
                   ? location.pathname.startsWith("/careers")
                   : isSubpageActive || (isHomepage && activeSection === item.targetId);
@@ -246,7 +250,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenJoinModal }) => {
                     ? `#${item.targetId}`
                     : item.targetId === "impact"
                       ? "/impact"
-                      : `/#${item.targetId}`;
+                      : item.targetId === "leadership"
+                        ? "/team"
+                        : `/#${item.targetId}`;
 
                 return (
                   <a

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Users, Plus, Search, Edit2, Trash2, Eye, EyeOff, 
-  ChevronLeft, ChevronRight, User 
+  ChevronLeft, ChevronRight, User, Filter 
 } from 'lucide-react';
 import { 
   adminGetTeamMembers, 
@@ -25,6 +25,7 @@ export const TeamManager: React.FC = () => {
   const pageSize = 12;
 
   const [search, setSearch] = useState('');
+  const [filterCategory, setFilterCategory] = useState<'ALL' | 'EXECUTIVE' | 'GENERAL' | 'PUBLISHED' | 'DRAFT'>('ALL');
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -86,6 +87,16 @@ export const TeamManager: React.FC = () => {
     }
   };
 
+  const displayedMembers = useMemo(() => {
+    return members.filter((m) => {
+      if (filterCategory === 'EXECUTIVE') return m.is_executive;
+      if (filterCategory === 'GENERAL') return !m.is_executive;
+      if (filterCategory === 'PUBLISHED') return m.published;
+      if (filterCategory === 'DRAFT') return !m.published;
+      return true;
+    });
+  }, [members, filterCategory]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -121,6 +132,21 @@ export const TeamManager: React.FC = () => {
             className="w-full bg-[#07111F]/80 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#D7B65A]/60"
           />
         </form>
+
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Filter className="w-4 h-4 text-slate-400 shrink-0" />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value as any)}
+            className="bg-[#07111F]/80 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#D7B65A]/60 cursor-pointer"
+          >
+            <option value="ALL">All Categories</option>
+            <option value="EXECUTIVE">Executive Council</option>
+            <option value="GENERAL">General Board</option>
+            <option value="PUBLISHED">Published Only</option>
+            <option value="DRAFT">Hidden / Draft</option>
+          </select>
+        </div>
       </div>
 
       {/* Members Grid / Table */}
@@ -151,7 +177,7 @@ export const TeamManager: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {members.map((member) => (
+                {displayedMembers.map((member) => (
                   <tr
                     key={member.id}
                     className="hover:bg-white/[0.03] transition-colors group"

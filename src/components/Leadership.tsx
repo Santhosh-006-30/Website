@@ -219,6 +219,16 @@ export const Leadership = () => {
           </AnimatePresence>
         </motion.div>
 
+        <div className="mt-12 text-center">
+          <a
+            href="/team"
+            className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-white/5 hover:bg-[#D7B65A]/15 border border-[#D7B65A]/30 text-xs sm:text-sm font-semibold text-[#D7B65A] hover:text-[#E8D89A] transition-all group shadow-sm"
+          >
+            <span>Explore Full Team &amp; Leadership Directory</span>
+            <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+          </a>
+        </div>
+
       </div>
 
       {/* Appointment Letter Modal Preview */}
